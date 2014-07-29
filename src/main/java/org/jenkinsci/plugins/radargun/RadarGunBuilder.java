@@ -8,6 +8,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import hudson.util.ListBoxModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,10 +89,17 @@ public class RadarGunBuilder extends Builder {
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject formData) throws FormException {
-            
             req.bindJSON(this, formData);
             save();
             return super.configure(req, formData);
+        }
+        
+        public ListBoxModel doFillRadarGunNameItems() {
+            ListBoxModel lb = new ListBoxModel();
+            for (RadarGunInstallation rgi : installations) {
+                lb.add(rgi.getName(), rgi.getName());
+            }
+            return lb;
         }
 
     }
