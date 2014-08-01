@@ -4,5 +4,21 @@
     <f:entry title="RadarGun instance">
         <f:select field="radarGunName" />
     </f:entry>
+    
+    <f:entry title="RadarGun scenario" description="RadarGun scenarion to be executed">
+        <f:hetero-radio field="scenarioSource" descriptors="${descriptor.scenarioSources}" />
+    </f:entry>
+    
+    <f:entry title="Node list" field="nodeListString" description="List of nodes the scenario will be executed. First is master node.">
+        <f:textarea />
+    </f:entry>
+    
+    <f:entry title="Start script" description="Script which will be used for staring appropriate processes on nodes">
+        <f:hetero-radio field="scriptSource" descriptors="${descriptor.scriptSources}" />
+    </f:entry>
+    
+    <f:entry title="Default JVM arguments" field="defaultJvmArgs" description="Defualt JVM args to be passed to master and slave nodes">
+        <f:textbox />
+    </f:entry>
 
 </j:jelly>
