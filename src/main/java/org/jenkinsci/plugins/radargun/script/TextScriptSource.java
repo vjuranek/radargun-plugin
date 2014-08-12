@@ -12,17 +12,23 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public class TextScriptSource extends ScriptSource {
 
-    private String script;
+    private final String masterScript;
+    private final String slaveScript;
 
     @DataBoundConstructor
-    public TextScriptSource(String script) {
-        this.script = script;
+    public TextScriptSource(String masterScript, String slaveScript) {
+        this.masterScript = masterScript;
+        this.slaveScript = slaveScript;
     }
 
-    public String getScript() {
-        return script;
+    public String getMasterScript() {
+        return masterScript;
     }
 
+    public String getSlaveScript() {
+        return slaveScript;
+    }
+    
     @Extension
     public static class DescriptorImpl extends ScriptSourceDescriptor {
         public String getDisplayName() {

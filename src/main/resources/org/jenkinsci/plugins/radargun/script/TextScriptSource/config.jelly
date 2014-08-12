@@ -1,7 +1,10 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
     xmlns:f="/lib/form">
 
-    <f:entry field="script">
+    <f:entry field="masterScript" title="Master start script">
+        <f:textarea />    
+    </f:entry>
+    <f:entry field="slaveScript" title="Slave start script">
         <f:textarea />    
     </f:entry>
 
