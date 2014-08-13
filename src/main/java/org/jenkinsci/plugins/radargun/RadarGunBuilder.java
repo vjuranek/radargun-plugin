@@ -18,8 +18,11 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 
+import org.jenkinsci.plugins.radargun.model.Node;
+import org.jenkinsci.plugins.radargun.model.NodeList;
 import org.jenkinsci.plugins.radargun.scenario.ScenarioSource;
 import org.jenkinsci.plugins.radargun.script.ScriptSource;
+import org.jenkinsci.plugins.radargun.utils.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -63,10 +66,17 @@ public class RadarGunBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
+        
+        NodeList nodes = ParseUtils.parseNodeList(nodeListString);
+        
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         // TODO check for null rgInstall
         String f = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
-        System.out.println("Starting " + f);
+        System.out.println("Starting " + f + " on " + nodes.getMaster().getHostname());
+        List<Node> slaves = nodes.getSlaves();
+        for(Node slave : slaves) {
+            System.out.println("Starting " + f + " on " + slave.getHostname());
+        }
         return true;
     }
 
