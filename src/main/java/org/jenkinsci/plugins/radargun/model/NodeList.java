@@ -39,4 +39,11 @@ public class NodeList {
         nodes.add(slave);
     }
     
+    public int getNodeCount() {
+        return nodes.size();
+    }
+    
+    public int getSlaveCount() {
+        return nodes.size() - 1;
+    }
 }

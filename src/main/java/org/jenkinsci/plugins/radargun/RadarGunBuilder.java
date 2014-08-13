@@ -4,7 +4,9 @@ import hudson.CopyOnWrite;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
+import hudson.Launcher.ProcStarter;
 import hudson.model.BuildListener;
+import hudson.model.StreamBuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
@@ -12,13 +14,18 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import net.sf.json.JSONObject;
 
-import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
 import org.jenkinsci.plugins.radargun.scenario.ScenarioSource;
 import org.jenkinsci.plugins.radargun.script.ScriptSource;
@@ -71,15 +78,35 @@ public class RadarGunBuilder extends Builder {
         
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         // TODO check for null rgInstall
-        String f = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
-        System.out.println("Starting " + f + " on " + nodes.getMaster().getHostname());
-        List<Node> slaves = nodes.getSlaves();
-        for(Node slave : slaves) {
-            System.out.println("Starting " + f + " on " + slave.getHostname());
-        }
+        String script = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
+        String cmdLine = script;
+        
+        BuildListener log = new StreamBuildListener(new PrintStream(new FileOutputStream("test.log")), Charset.defaultCharset());
+        ProcStarter masterProcStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(log)).pwd(build.getWorkspace()).stdout(log);
+        
+        runRGNodes(masterProcStarter, new ArrayList<ProcStarter>());
+        
         return true;
     }
 
+    private void runRGNodes(ProcStarter masterProcStarter, List<ProcStarter> slaveProcStarters) {
+        int nodeCount = slaveProcStarters.size() + 1;
+        CountDownLatch latch = new CountDownLatch(nodeCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(nodeCount);
+        // schedule master run
+        executorService.submit(new NodeRunner(masterProcStarter, latch));
+        // schedule slave runs
+        for(ProcStarter slaveProcStarter : slaveProcStarters) {
+            executorService.submit(new NodeRunner(slaveProcStarter, latch));
+        }
+        // wait for processes to be finished
+        try {
+            latch.await();
+        } catch(InterruptedException e) {
+            //TODO log exception
+        }
+    }
+    
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
