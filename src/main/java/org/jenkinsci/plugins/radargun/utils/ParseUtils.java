@@ -8,8 +8,6 @@ import org.jenkinsci.plugins.radargun.model.NodeList;
 
 public class ParseUtils {
 
-    private static final String EOL_REG_EXP = "\\r?\\n";
-    
     /**
      * 
      * Parse node list. Expected format is
@@ -22,7 +20,7 @@ public class ParseUtils {
      * 
      */
     public static NodeList parseNodeList(String nodeList) {
-        String[] lines = nodeList.split(EOL_REG_EXP);
+        String[] lines = nodeList.split(System.lineSeparator());
         Node master = Node.parseNode(lines[0]);
         List<Node> slaves = new ArrayList<>();
         for(int i = 1; i < lines.length; i++) {
