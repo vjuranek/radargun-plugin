@@ -4,19 +4,34 @@
     <f:entry title="RadarGun instance">
         <f:select field="radarGunName" />
     </f:entry>
-    
-    <f:entry title="RadarGun scenario" description="RadarGun scenarion to be executed">
-        <f:hetero-radio field="scenarioSource" descriptors="${descriptor.scenarioSources}" />
-    </f:entry>
-    
+
+    <j:set var="currScenario" value="${instance.scenarioSource}" />
+    <f:dropdownList name="scenarioSource" title="RadarGun scenario" description="RadarGun scenarion to be executed">
+        <j:forEach var="desc" items="${descriptor.scenarioSources}" varStatus="loop">
+            <f:dropdownListBlock title="${desc.displayName}" value="${loop.index}"
+                selected="${desc==currScenario.descriptor}" staplerClass="${desc.clazz.name}">
+                <j:set var="instance" value="${currScenario}" />
+                <st:include page="${desc.configPage}" from="${desc}" />
+            </f:dropdownListBlock>
+        </j:forEach>
+    </f:dropdownList>
+
     <f:entry title="Node list" field="nodeListString" description="List of nodes the scenario will be executed. First is master node.">
         <f:textarea />
     </f:entry>
-    
-    <f:entry title="Start script" description="Script which will be used for staring appropriate processes on nodes">
-        <f:hetero-radio field="scriptSource" descriptors="${descriptor.scriptSources}" />
-    </f:entry>
-    
+
+    <j:set var="currScript" value="${instance.scriptSource}" />
+    <f:dropdownList name="scriptSource" title="Start script"
+        description="Script which will be used for staring appropriate processes on nodes">
+        <j:forEach var="desc" items="${descriptor.scriptSources}" varStatus="loop">
+            <f:dropdownListBlock title="${desc.displayName}" value="${loop.index}" selected="${desc==currScript.descriptor}"
+                staplerClass="${desc.clazz.name}">
+                <j:set var="instance" value="${currScript}" />
+                <st:include page="${desc.configPage}" from="${desc}" />
+            </f:dropdownListBlock>
+        </j:forEach>
+    </f:dropdownList>
+
     <f:entry title="Default JVM arguments" field="defaultJvmArgs" description="Defualt JVM args to be passed to master and slave nodes">
         <f:textbox />
     </f:entry>
