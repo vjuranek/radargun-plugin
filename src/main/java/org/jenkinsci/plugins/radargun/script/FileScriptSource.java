@@ -2,8 +2,6 @@ package org.jenkinsci.plugins.radargun.script;
 
 import hudson.Extension;
 
-import java.io.File;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -14,28 +12,29 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public class FileScriptSource extends ScriptSource {
 
-    private final String masterScriptPath;
-    private final String slaveScriptPath;
-    private transient File tmpScriptFile;
+    private final String mastertPath;
+    private final String slavePath;
 
     @DataBoundConstructor
-    public FileScriptSource(String masterScriptPath, String slaveScriptPath) {
-        this.masterScriptPath = masterScriptPath;
-        this.slaveScriptPath = slaveScriptPath;
+    public FileScriptSource(String masterPath, String slavePath) {
+        this.mastertPath = masterPath;
+        this.slavePath = slavePath;
     }
 
+    public String getMasterPath() {
+        return mastertPath;
+    }
+    
+    public String getSlavePath() {
+        return slavePath;
+    }
+    
     public String getMasterScriptPath() {
-        return masterScriptPath;
+        return mastertPath;
     }
     
     public String getSlaveScriptPath() {
-        return slaveScriptPath;
-    }
-
-    public String getDefaultScriptPath() {
-        if (tmpScriptFile != null)
-            return tmpScriptFile.getPath();
-        return masterScriptPath;
+        return slavePath;
     }
 
     @Extension

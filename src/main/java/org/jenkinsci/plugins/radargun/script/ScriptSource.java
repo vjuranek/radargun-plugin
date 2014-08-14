@@ -9,20 +9,24 @@ import jenkins.model.Jenkins;
  * ScriptSource
  * 
  * @author vjuranek
- *
+ * 
  */
 public abstract class ScriptSource implements Describable<ScriptSource> {
-    
+
+    public abstract String getMasterScriptPath();
+
+    public abstract String getSlaveScriptPath();
+
     @Override
     @SuppressWarnings("unchecked")
     public Descriptor<ScriptSource> getDescriptor() {
         return Jenkins.getInstance().getDescriptorOrDie(getClass());
     }
-    
+
     public static final DescriptorExtensionList<ScriptSource, Descriptor<ScriptSource>> all() {
         return Jenkins.getInstance().getDescriptorList(ScriptSource.class);
     }
-    
+
     public static abstract class ScriptSourceDescriptor extends Descriptor<ScriptSource> {
     }
 

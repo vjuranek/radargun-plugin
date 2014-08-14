@@ -78,13 +78,15 @@ public class RadarGunBuilder extends Builder {
         
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         // TODO check for null rgInstall
-        String script = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
-        String cmdLine = script;
+        //String script = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
+        String cmdLine = scriptSource.getMasterScriptPath();
         
+        //TODO output file
         BuildListener log = new StreamBuildListener(new PrintStream(new FileOutputStream("test.log")), Charset.defaultCharset());
         ProcStarter masterProcStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(log)).pwd(build.getWorkspace()).stdout(log);
-        
-        runRGNodes(masterProcStarter, new ArrayList<ProcStarter>());
+        List<ProcStarter> slaveProcStarters = new ArrayList<>();
+        //TODO create slave proc starters 
+        runRGNodes(masterProcStarter, slaveProcStarters);
         
         return true;
     }

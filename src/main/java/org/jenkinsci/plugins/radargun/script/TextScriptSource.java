@@ -29,6 +29,14 @@ public class TextScriptSource extends ScriptSource {
         return slaveScript;
     }
     
+    public String getMasterScriptPath() {
+        return null;
+    }
+    
+    public String getSlaveScriptPath() {
+        return null;
+    }
+    
     @Extension
     public static class DescriptorImpl extends ScriptSourceDescriptor {
         public String getDisplayName() {
