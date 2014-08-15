@@ -30,7 +30,7 @@ import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
 import org.jenkinsci.plugins.radargun.scenario.ScenarioSource;
 import org.jenkinsci.plugins.radargun.script.ScriptSource;
-import org.jenkinsci.plugins.radargun.utils.ParseUtils;
+import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
