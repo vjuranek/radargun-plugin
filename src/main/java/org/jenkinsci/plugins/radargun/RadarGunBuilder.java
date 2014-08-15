@@ -14,6 +14,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -30,11 +31,14 @@ import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
 import org.jenkinsci.plugins.radargun.scenario.ScenarioSource;
 import org.jenkinsci.plugins.radargun.script.ScriptSource;
+import org.jenkinsci.plugins.radargun.util.Functions;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class RadarGunBuilder extends Builder {
+
+    private static final String NODE_LOG_FILE_SUFFIX = ".log";
 
     private final String radarGunName;
     private final ScenarioSource scenarioSource;
@@ -82,36 +86,38 @@ public class RadarGunBuilder extends Builder {
         // TODO check for null rgInstall
         // String script = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
 
+        List<NodeRunner> nodeRunners = new ArrayList<>();
+
         // master start script
+        RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname());
+        build.addAction(masterAction);
         String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(),
                 scenarioSource.getScenarioPath(), buildJvmOptions(nodes.getMaster()));
-        //TODO log name
-        ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, "master.log");
-        
-        // slave start script
-        List<ProcStarter> slaveProcStarters = new ArrayList<>();
+        ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
+        nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
+
+        // slave start scripts
         for (Node slave : nodes.getSlaves()) {
+            RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
+            build.addAction(slaveAction);
             String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), buildJvmOptions(slave));
-            //TODO log name
-            slaveProcStarters.add(buildProcStarter(build, launcher, slaveCmdLine, String.format("slave_%s.log", slave.getHostname())));
+            ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
+            nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
 
         // run all start scripts and wait for completion
-        runRGNodes(masterProcStarter, slaveProcStarters);
+        runRGNodes(nodeRunners);
 
         // TODO correct return value based on return values of scheduled scripts
         return true;
     }
 
-    private void runRGNodes(ProcStarter masterProcStarter, List<ProcStarter> slaveProcStarters) {
-        int nodeCount = slaveProcStarters.size() + 1;
-        CountDownLatch latch = new CountDownLatch(nodeCount);
-        ExecutorService executorService = Executors.newFixedThreadPool(nodeCount);
-        // schedule master run
-        executorService.submit(new NodeRunner(masterProcStarter, latch));
-        // schedule slave runs
-        for (ProcStarter slaveProcStarter : slaveProcStarters) {
-            executorService.submit(new NodeRunner(slaveProcStarter, latch));
+    private void runRGNodes(List<NodeRunner> nodeRunners) {
+        CountDownLatch latch = new CountDownLatch(nodeRunners.size());
+        ExecutorService executorService = Executors.newFixedThreadPool(nodeRunners.size());
+        for (NodeRunner runner : nodeRunners) {
+            runner.setLatch(latch);
+            executorService.submit(runner);
         }
         // wait for processes to be finished
         try {
@@ -122,15 +128,15 @@ public class RadarGunBuilder extends Builder {
     }
 
     private String buildJvmOptions(Node node) {
-        return node.getJvmOptions() == null ? defaultJvmArgs : String.format("%s %s", defaultJvmArgs, node.getJvmOptions());
+        return node.getJvmOptions() == null ? defaultJvmArgs : String.format("%s %s", defaultJvmArgs,
+                node.getJvmOptions());
     }
 
-    private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, String logFileName)
+    private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)
             throws IOException, InterruptedException {
-        BuildListener log = new StreamBuildListener(new PrintStream(new FileOutputStream(logFileName)),
-                Charset.defaultCharset());
-        ProcStarter procStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(log))
-                .pwd(build.getWorkspace()).stdout(log);
+        BuildListener logListener = new StreamBuildListener(log, Charset.defaultCharset());
+        ProcStarter procStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(logListener))
+                .pwd(build.getWorkspace()).stdout(logListener);
         return procStarter;
     }
 

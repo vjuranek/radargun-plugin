@@ -1,0 +1,6 @@
+<!-- Displays the console output as plain/text -->
+<st:compress xmlns:j="jelly:core" xmlns:st="jelly:stapler">
+	<st:contentType value="text/plain;charset=UTF-8" />
+	<j:set var="logReader" value="${it.logReader}" />
+	<st:copyStream reader="${logReader}" />
+</st:compress>
