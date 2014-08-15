@@ -27,7 +27,7 @@ public class RadarGunNodeAction implements Action {
     public RadarGunNodeAction(AbstractBuild<?, ?> build, String hostname) {
         this.build = build;
         this.hostname = hostname;
-        this.inProgress = true;
+        this.inProgress = false;
     }
     
     public AbstractBuild<?, ?> getBuild() {
