@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 
 import net.sf.json.JSONObject;
 
+import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
 import org.jenkinsci.plugins.radargun.scenario.ScenarioSource;
 import org.jenkinsci.plugins.radargun.script.ScriptSource;
@@ -40,9 +41,10 @@ public class RadarGunBuilder extends Builder {
     private final String nodeListString;
     private final ScriptSource scriptSource;
     private final String defaultJvmArgs;
-    
+
     @DataBoundConstructor
-    public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, String nodeListString, ScriptSource scriptSource, String defaultJvmArgs) {
+    public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, String nodeListString,
+            ScriptSource scriptSource, String defaultJvmArgs) {
         this.radarGunName = radarGunName;
         this.scenarioSource = scenarioSource;
         this.nodeListString = nodeListString;
@@ -57,15 +59,15 @@ public class RadarGunBuilder extends Builder {
     public ScenarioSource getScenarioSource() {
         return scenarioSource;
     }
-    
+
     public String getNodeListString() {
         return nodeListString;
     }
-    
+
     public ScriptSource getScriptSource() {
         return scriptSource;
     }
-    
+
     public String getDefaultJvmArgs() {
         return defaultJvmArgs;
     }
@@ -73,21 +75,31 @@ public class RadarGunBuilder extends Builder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
-        
+
         NodeList nodes = ParseUtils.parseNodeList(nodeListString);
-        
+
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         // TODO check for null rgInstall
-        //String script = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
-        String cmdLine = scriptSource.getMasterScriptPath();
+        // String script = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
+
+        // master start script
+        String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(),
+                scenarioSource.getScenarioPath(), buildJvmOptions(nodes.getMaster()));
+        //TODO log name
+        ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, "master.log");
         
-        //TODO output file
-        BuildListener log = new StreamBuildListener(new PrintStream(new FileOutputStream("test.log")), Charset.defaultCharset());
-        ProcStarter masterProcStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(log)).pwd(build.getWorkspace()).stdout(log);
+        // slave start script
         List<ProcStarter> slaveProcStarters = new ArrayList<>();
-        //TODO create slave proc starters 
+        for (Node slave : nodes.getSlaves()) {
+            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), buildJvmOptions(slave));
+            //TODO log name
+            slaveProcStarters.add(buildProcStarter(build, launcher, slaveCmdLine, String.format("slave_%s.log", slave.getHostname())));
+        }
+
+        // run all start scripts and wait for completion
         runRGNodes(masterProcStarter, slaveProcStarters);
-        
+
+        // TODO correct return value based on return values of scheduled scripts
         return true;
     }
 
@@ -98,17 +110,30 @@ public class RadarGunBuilder extends Builder {
         // schedule master run
         executorService.submit(new NodeRunner(masterProcStarter, latch));
         // schedule slave runs
-        for(ProcStarter slaveProcStarter : slaveProcStarters) {
+        for (ProcStarter slaveProcStarter : slaveProcStarters) {
             executorService.submit(new NodeRunner(slaveProcStarter, latch));
         }
         // wait for processes to be finished
         try {
             latch.await();
-        } catch(InterruptedException e) {
-            //TODO log exception
+        } catch (InterruptedException e) {
+            // TODO log exception
         }
     }
-    
+
+    private String buildJvmOptions(Node node) {
+        return node.getJvmOptions() == null ? defaultJvmArgs : String.format("%s %s", defaultJvmArgs, node.getJvmOptions());
+    }
+
+    private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, String logFileName)
+            throws IOException, InterruptedException {
+        BuildListener log = new StreamBuildListener(new PrintStream(new FileOutputStream(logFileName)),
+                Charset.defaultCharset());
+        ProcStarter procStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(log))
+                .pwd(build.getWorkspace()).stdout(log);
+        return procStarter;
+    }
+
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
@@ -173,7 +198,7 @@ public class RadarGunBuilder extends Builder {
         public static DescriptorExtensionList<ScenarioSource, Descriptor<ScenarioSource>> getScenarioSources() {
             return ScenarioSource.all();
         }
-        
+
         public static DescriptorExtensionList<ScriptSource, Descriptor<ScriptSource>> getScriptSources() {
             return ScriptSource.all();
         }

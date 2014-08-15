@@ -29,6 +29,12 @@ public class TextScenarioSource extends ScenarioSource {
         return scenario;
     }
 
+    @Override
+    public String getScenarioPath() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public void createScriptFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
         FilePath path = createDefaultScriptFile(scenario, build);
         tmpScenarioFile = new File(path.getRemote());

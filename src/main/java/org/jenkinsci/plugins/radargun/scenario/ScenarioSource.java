@@ -1,13 +1,14 @@
 package org.jenkinsci.plugins.radargun.scenario;
 
-import java.io.IOException;
-
 import hudson.DescriptorExtensionList;
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
 import hudson.model.Describable;
+import hudson.model.AbstractBuild;
 import hudson.model.Descriptor;
 import hudson.model.ParametersAction;
+
+import java.io.IOException;
+
 import jenkins.model.Jenkins;
 
 /**
@@ -21,6 +22,7 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
     protected static final String DEFAULT_SCENARIO_NAME = "radarGunScenario";
     protected static final String DEFAULT_SCENARIO_SUFFIX = ".xml";
     
+    public abstract String getScenarioPath();
     
     /**
      * Replace parameters in scenario and stores scenario into tmp file in workspace
