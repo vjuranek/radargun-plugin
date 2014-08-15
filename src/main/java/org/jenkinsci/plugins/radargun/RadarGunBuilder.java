@@ -15,9 +15,7 @@ import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +29,6 @@ import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
 import org.jenkinsci.plugins.radargun.scenario.ScenarioSource;
 import org.jenkinsci.plugins.radargun.script.ScriptSource;
-import org.jenkinsci.plugins.radargun.util.Functions;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -92,7 +89,7 @@ public class RadarGunBuilder extends Builder {
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname());
         build.addAction(masterAction);
         String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(),
-                scenarioSource.getScenarioPath(), buildJvmOptions(nodes.getMaster()));
+                scenarioSource.getTmpScenarioPath(build), buildJvmOptions(nodes.getMaster()));
         ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
         nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
 

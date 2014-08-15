@@ -4,7 +4,6 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -18,7 +17,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public class TextScenarioSource extends ScenarioSource {
 
     private String scenario;
-    private transient File tmpScenarioFile;
 
     @DataBoundConstructor
     public TextScenarioSource(String scenario) {
@@ -29,19 +27,8 @@ public class TextScenarioSource extends ScenarioSource {
         return scenario;
     }
 
-    @Override
-    public String getScenarioPath() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void createScriptFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
-        FilePath path = createDefaultScriptFile(scenario, build);
-        tmpScenarioFile = new File(path.getRemote());
-    }
-
-    public String getDefaultScriptPath() {
-        return tmpScenarioFile.getPath();
+    public FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
+        return tmpScenarioFromContent(scenario, build);
     }
 
     @Extension
