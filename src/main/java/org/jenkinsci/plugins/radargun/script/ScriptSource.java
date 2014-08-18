@@ -16,15 +16,44 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
     public abstract String getMasterScriptPath();
 
     public abstract String getSlaveScriptPath();
-    
-    public String[] getMasterCmdLine(String hostname, String scenarioPath, String jvmOpts) {
-        return new String[] {getMasterScriptPath(), hostname, scenarioPath, jvmOpts};
+
+    /**
+     * Prepares command line which will be used to start master process
+     * 
+     * @param hostname
+     *            master hostname (typically for ssh there)
+     * @param rgMasterScript
+     *            path to RG master.sh script on this machine
+     * @param scenarioPath
+     *            path to scenario to be executed
+     * @param jvmOpts
+     *            additional JVM options for master process
+     * 
+     */
+    public String[] getMasterCmdLine(String hostname, String rgMasterScript, String scenarioPath, String slaveNumber,
+            String jvmOpts) {
+        // Run with "tail" option ("-t") not to finish immediately once the RG process is started.
+        // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
+        // And also to gather the log from master
+        return new String[] { getMasterScriptPath(), hostname, rgMasterScript + " -t", scenarioPath, slaveNumber, jvmOpts };
     }
 
-    public String[] getSlaveCmdLine(String hostname, String jvmOpts) {
-        return new String[] {getSlaveScriptPath(), hostname, jvmOpts};
+    /**
+     * Prepares command line which will be used to start slave process
+     * 
+     * @param hostname
+     *            slave hostname (typically for ssh there)
+     * @param rgSlaveScript
+     *            path to RG slave.sh script on this machine
+     * @param jvmOpts
+     *            additional JVM options for master process
+     * 
+     */
+    public String[] getSlaveCmdLine(String hostname, String rgSlaveScript, String jvmOpts) {
+        // run with "tail" option ("-t") to gather the logs from slaves
+        return new String[] { getSlaveScriptPath(), hostname, rgSlaveScript + " -t", jvmOpts };
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public Descriptor<ScriptSource> getDescriptor() {

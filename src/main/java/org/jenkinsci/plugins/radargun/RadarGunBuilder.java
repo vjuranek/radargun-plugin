@@ -77,19 +77,19 @@ public class RadarGunBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
 
-        NodeList nodes = ParseUtils.parseNodeList(nodeListString);
-
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
-        // TODO check for null rgInstall
-        // String script = rgInstall.getExecutable(RadarGunExecutable.LOCAL, launcher.getChannel());
+        String rgMasterScript = rgInstall.getExecutable(RadarGunExecutable.MASTER, launcher.getChannel());
+        String rgSlaveScript = rgInstall.getExecutable(RadarGunExecutable.SLAVE, launcher.getChannel());
 
+        NodeList nodes = ParseUtils.parseNodeList(nodeListString);
         List<NodeRunner> nodeRunners = new ArrayList<>();
 
         // master start script
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname());
         build.addAction(masterAction);
-        String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(),
-                scenarioSource.getTmpScenarioPath(build), buildJvmOptions(nodes.getMaster()));
+        String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(), rgMasterScript,
+                scenarioSource.getTmpScenarioPath(build), Integer.toString(nodes.getSlaveCount()),
+                buildJvmOptions(nodes.getMaster()));
         ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
         nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
 
@@ -97,7 +97,8 @@ public class RadarGunBuilder extends Builder {
         for (Node slave : nodes.getSlaves()) {
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
-            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), buildJvmOptions(slave));
+            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript,
+                    buildJvmOptions(slave));
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
