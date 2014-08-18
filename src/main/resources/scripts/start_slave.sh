@@ -1,3 +1,9 @@
 #!/bin/bash
 
-echo "Starting slave $1"
+set -x
+
+# Script for launching RG master
+# See org.jenkinsci.plugins.radargun.script.ScriptSource#getMasterCmdLine for description of parameters
+# begin passed to this script and their order
+
+$2
