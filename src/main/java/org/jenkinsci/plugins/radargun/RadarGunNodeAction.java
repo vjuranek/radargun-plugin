@@ -19,14 +19,25 @@ import hudson.model.Action;
 
 public class RadarGunNodeAction implements Action {
     
+    private static final String DEFAULT_ACTION_NAME = "RadarGun node ";
+    
     private final AbstractBuild<?, ?> build;
     private final String hostname;
+    private final String actionName;
     private boolean inProgress;
     
     
     public RadarGunNodeAction(AbstractBuild<?, ?> build, String hostname) {
         this.build = build;
         this.hostname = hostname;
+        this.actionName = DEFAULT_ACTION_NAME;
+        this.inProgress = false;
+    }
+    
+    public RadarGunNodeAction(AbstractBuild<?, ?> build, String hostname, String actionName) {
+        this.build = build;
+        this.hostname = hostname;
+        this.actionName = actionName;
         this.inProgress = false;
     }
     
@@ -51,7 +62,7 @@ public class RadarGunNodeAction implements Action {
     }
 
     public String getDisplayName() {
-        return "RadarGun node " + hostname;
+        return actionName + hostname;
     }
 
     public String getUrlName() {

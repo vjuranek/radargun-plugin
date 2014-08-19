@@ -35,8 +35,6 @@ import org.kohsuke.stapler.StaplerRequest;
 
 public class RadarGunBuilder extends Builder {
 
-    private static final String NODE_LOG_FILE_SUFFIX = ".log";
-
     private final String radarGunName;
     private final ScenarioSource scenarioSource;
     private final String nodeListString;
@@ -85,7 +83,8 @@ public class RadarGunBuilder extends Builder {
         List<NodeRunner> nodeRunners = new ArrayList<>();
 
         // master start script
-        RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname());
+        RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
+                "RadarGun master ");
         build.addAction(masterAction);
         String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(), rgMasterScript,
                 scenarioSource.getTmpScenarioPath(build), Integer.toString(nodes.getSlaveCount()),
