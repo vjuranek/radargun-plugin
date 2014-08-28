@@ -35,7 +35,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         // Run with "tail" option ("-t") not to finish immediately once the RG process is started.
         // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
         // And also to gather the log from master
-        return new String[] { getMasterScriptPath(), hostname, rgMasterScript + " -t", scenarioPath, slaveNumber, jvmOpts };
+        return new String[] { getMasterScriptPath(), hostname, rgMasterScript , "-t", scenarioPath, slaveNumber, jvmOpts };
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
      */
     public String[] getSlaveCmdLine(String hostname, String rgSlaveScript, String jvmOpts) {
         // run with "tail" option ("-t") to gather the logs from slaves
-        return new String[] { getSlaveScriptPath(), hostname, rgSlaveScript + " -t", jvmOpts };
+        return new String[] { getSlaveScriptPath(), hostname, rgSlaveScript, "-t", jvmOpts };
     }
 
     @Override
