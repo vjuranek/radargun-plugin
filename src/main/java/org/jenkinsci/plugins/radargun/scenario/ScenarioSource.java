@@ -40,10 +40,10 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
      */
     public FilePath tmpScenarioFromContent(String scenarioContent, AbstractBuild<?, ?> build)
             throws InterruptedException, IOException {
-        String scenario = Resolver.buildVar(build, scenarioContent);
+        //String scenario = Resolver.buildVar(build, scenarioContent);
         // TODO env. var expansion? Expand on node where it will be launched
         FilePath path = build.getWorkspace().createTextTempFile(DEFAULT_SCENARIO_NAME, DEFAULT_SCENARIO_SUFFIX,
-                scenario, true);
+                scenarioContent, true);
         return path;
     }
 
