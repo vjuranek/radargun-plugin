@@ -80,7 +80,7 @@ public class RadarGunBuilder extends Builder {
         String rgSlaveScript = rgInstall.getExecutable(RadarGunExecutable.SLAVE, launcher.getChannel());
 
         NodeList nodes = ParseUtils.parseNodeList(nodeListString);
-        List<NodeRunner> nodeRunners = new ArrayList<>();
+        List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>();
 
         // master start script
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),

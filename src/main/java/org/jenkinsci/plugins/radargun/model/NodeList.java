@@ -14,7 +14,7 @@ public class NodeList {
     private final List<Node> nodes;
 
     public NodeList(Node master) {
-        nodes = new ArrayList<>();
+        nodes = new ArrayList<Node>();
         nodes.add(master);
     }
     

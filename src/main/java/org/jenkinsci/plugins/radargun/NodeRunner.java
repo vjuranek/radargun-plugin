@@ -28,8 +28,10 @@ public class NodeRunner implements Runnable {
         try {
             Proc proc = procStarter.start();
             int retCode = proc.join();
-        } catch(IOException|InterruptedException e) {
+        } catch(IOException e) {
             //TODO log errors
+        } catch(InterruptedException e) {
+          //TODO log errors
         }
         
         nodeAction.setInProgress(false);

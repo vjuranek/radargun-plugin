@@ -20,9 +20,9 @@ public class ParseUtils {
      * 
      */
     public static NodeList parseNodeList(String nodeList) {
-        String[] lines = nodeList.split(System.lineSeparator());
+        String[] lines = nodeList.split(System.getProperty("line.separator"));
         Node master = Node.parseNode(lines[0]);
-        List<Node> slaves = new ArrayList<>();
+        List<Node> slaves = new ArrayList<Node>();
         for(int i = 1; i < lines.length; i++) {
             slaves.add(Node.parseNode(lines[i]));
         }
