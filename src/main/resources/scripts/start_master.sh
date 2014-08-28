@@ -6,4 +6,4 @@
 # begin passed to this script and their order
 
 set -x
-$2 -c $3 -s $4
+ssh $1 $2 -c $3 -s $4
