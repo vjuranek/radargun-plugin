@@ -25,11 +25,11 @@ import java.util.concurrent.Executors;
 
 import net.sf.json.JSONObject;
 
+import org.jenkinsci.plugins.radargun.config.NodeSource;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
 import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
-import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -37,16 +37,16 @@ public class RadarGunBuilder extends Builder {
 
     private final String radarGunName;
     private final ScenarioSource scenarioSource;
-    private final String nodeListString;
+    private final NodeSource nodeSource;
     private final ScriptSource scriptSource;
     private final String defaultJvmArgs;
 
     @DataBoundConstructor
-    public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, String nodeListString,
+    public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeSource nodeSource,
             ScriptSource scriptSource, String defaultJvmArgs) {
         this.radarGunName = radarGunName;
         this.scenarioSource = scenarioSource;
-        this.nodeListString = nodeListString;
+        this.nodeSource = nodeSource;
         this.scriptSource = scriptSource;
         this.defaultJvmArgs = defaultJvmArgs;
     }
@@ -59,8 +59,8 @@ public class RadarGunBuilder extends Builder {
         return scenarioSource;
     }
 
-    public String getNodeListString() {
-        return nodeListString;
+    public NodeSource getNodeSource() {
+        return nodeSource;
     }
 
     public ScriptSource getScriptSource() {
@@ -79,7 +79,7 @@ public class RadarGunBuilder extends Builder {
         String rgMasterScript = rgInstall.getExecutable(RadarGunExecutable.MASTER, launcher.getChannel());
         String rgSlaveScript = rgInstall.getExecutable(RadarGunExecutable.SLAVE, launcher.getChannel());
 
-        NodeList nodes = ParseUtils.parseNodeList(nodeListString);
+        NodeList nodes = nodeSource.getNodesList();
         List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>();
 
         // master start script
@@ -200,6 +200,10 @@ public class RadarGunBuilder extends Builder {
 
         public static DescriptorExtensionList<ScenarioSource, Descriptor<ScenarioSource>> getScenarioSources() {
             return ScenarioSource.all();
+        }
+
+        public static DescriptorExtensionList<NodeSource, Descriptor<NodeSource>> getNodeSources() {
+            return NodeSource.all();
         }
 
         public static DescriptorExtensionList<ScriptSource, Descriptor<ScriptSource>> getScriptSources() {

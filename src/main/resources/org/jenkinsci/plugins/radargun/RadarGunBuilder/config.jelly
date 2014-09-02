@@ -15,10 +15,18 @@
             </f:dropdownListBlock>
         </j:forEach>
     </f:dropdownList>
-
-    <f:entry title="Node list" field="nodeListString" description="List of nodes the scenario will be executed. First is master node.">
-        <f:textarea />
-    </f:entry>
+    
+    <j:set var="currNode" value="${instance.nodeSource}" />
+    <f:dropdownList name="nodeSource" title="Node list"
+        description="List of the nodes where RadarGun will run">
+        <j:forEach var="desc" items="${descriptor.nodeSources}" varStatus="loop">
+            <f:dropdownListBlock title="${desc.displayName}" value="${loop.index}" selected="${desc==currNode.descriptor}"
+                staplerClass="${desc.clazz.name}">
+                <j:set var="instance" value="${currNode}" />
+                <st:include page="${desc.configPage}" from="${desc}" />
+            </f:dropdownListBlock>
+        </j:forEach>
+    </f:dropdownList>
 
     <j:set var="currScript" value="${instance.scriptSource}" />
     <f:dropdownList name="scriptSource" title="Start script"
