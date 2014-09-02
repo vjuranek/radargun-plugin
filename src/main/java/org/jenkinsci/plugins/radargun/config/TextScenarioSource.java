@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.radargun.scenario;
+package org.jenkinsci.plugins.radargun.config;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -9,32 +9,32 @@ import java.io.IOException;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
- * FileScenarioSource
+ * TextScenarioSource
  * 
  * @author vjuranek
  * 
  */
-public class FileScenarioSource extends ScenarioSource {
+public class TextScenarioSource extends ScenarioSource {
 
-    private String scenarioPath;
+    private String scenario;
 
     @DataBoundConstructor
-    public FileScenarioSource(String scenarioPath) {
-        this.scenarioPath = scenarioPath;
+    public TextScenarioSource(String scenario) {
+        this.scenario = scenario;
     }
 
-    public String getScenarioPath() {
-        return scenarioPath;
+    public String getScenario() {
+        return scenario;
     }
 
     public FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
-        return tmpScenarioFromFile(scenarioPath, build);
+        return tmpScenarioFromContent(scenario, build);
     }
 
     @Extension
     public static class DescriptorImpl extends ScenarioSourceDescriptor {
         public String getDisplayName() {
-            return "File scenario source";
+            return "Text scenario source";
         }
     }
 

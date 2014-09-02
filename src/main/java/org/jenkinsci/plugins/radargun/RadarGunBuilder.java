@@ -25,10 +25,10 @@ import java.util.concurrent.Executors;
 
 import net.sf.json.JSONObject;
 
+import org.jenkinsci.plugins.radargun.config.ScenarioSource;
+import org.jenkinsci.plugins.radargun.config.ScriptSource;
 import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
-import org.jenkinsci.plugins.radargun.scenario.ScenarioSource;
-import org.jenkinsci.plugins.radargun.script.ScriptSource;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;

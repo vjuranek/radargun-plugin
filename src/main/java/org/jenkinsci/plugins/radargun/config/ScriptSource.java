@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.radargun.script;
+package org.jenkinsci.plugins.radargun.config;
 
 import hudson.DescriptorExtensionList;
 import hudson.model.Describable;

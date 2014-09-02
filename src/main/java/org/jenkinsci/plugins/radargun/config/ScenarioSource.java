@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.radargun.scenario;
+package org.jenkinsci.plugins.radargun.config;
 
 import hudson.DescriptorExtensionList;
 import hudson.FilePath;
