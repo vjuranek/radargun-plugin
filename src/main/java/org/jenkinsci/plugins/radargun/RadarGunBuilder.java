@@ -93,11 +93,13 @@ public class RadarGunBuilder extends Builder {
         nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
 
         // slave start scripts
-        for (Node slave : nodes.getSlaves()) {
+        List<Node> slaves = nodes.getSlaves();
+        for (int i = 0; i < slaves.size(); i++) {
+            Node slave = slaves.get(i);
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
             String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript,
-                    buildJvmOptions(slave));
+                    String.valueOf(i+1), buildJvmOptions(slave)); //TODO do we want to start slave index from zero?
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }

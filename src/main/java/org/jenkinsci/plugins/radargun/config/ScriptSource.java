@@ -45,13 +45,15 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
      *            slave hostname (typically for ssh there)
      * @param rgSlaveScript
      *            path to RG slave.sh script on this machine
+     * @param slaveIndex
+     *            slave index
      * @param jvmOpts
-     *            additional JVM options for master process
+     *            additional JVM options for master process           
      * 
      */
-    public String[] getSlaveCmdLine(String hostname, String rgSlaveScript, String jvmOpts) {
+    public String[] getSlaveCmdLine(String hostname, String rgSlaveScript, String slaveIndex, String jvmOpts) {
         // run with "tail" option ("-t") to gather the logs from slaves
-        return new String[] { getSlaveScriptPath(), hostname, rgSlaveScript, "-t", jvmOpts };
+        return new String[] { getSlaveScriptPath(), hostname, rgSlaveScript, "-t", slaveIndex, jvmOpts };
     }
 
     @Override
