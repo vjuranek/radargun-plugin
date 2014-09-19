@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.radargun;
 
+import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
@@ -34,6 +37,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class RadarGunBuilder extends Builder {
+    
+    private static Logger LOGGER = Logger.getLogger(RadarGunBuilder.class.getName());
 
     private final String radarGunName;
     private final ScenarioSource scenarioSource;
@@ -111,7 +116,7 @@ public class RadarGunBuilder extends Builder {
         return true;
     }
 
-    private void runRGNodes(List<NodeRunner> nodeRunners) {
+    private void runRGNodes(List<NodeRunner> nodeRunners) throws AbortException {
         CountDownLatch latch = new CountDownLatch(nodeRunners.size());
         ExecutorService executorService = Executors.newFixedThreadPool(nodeRunners.size());
         for (NodeRunner runner : nodeRunners) {
@@ -122,7 +127,8 @@ public class RadarGunBuilder extends Builder {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            // TODO log exception
+            LOGGER.log(Level.INFO, "Failing the build - build interrupted", e);
+            throw new AbortException(e.getMessage());
         }
     }
 

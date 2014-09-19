@@ -5,8 +5,12 @@ import hudson.Proc;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NodeRunner implements Runnable {
+    
+    private static Logger LOGGER = Logger.getLogger(NodeRunner.class.getName());
     
     private final ProcStarter procStarter;
     private final RadarGunNodeAction nodeAction;
@@ -23,15 +27,17 @@ public class NodeRunner implements Runnable {
     
     @Override
     public void run() {
+        LOGGER.log(Level.FINER, String.format("Staring runner %s", nodeAction.getDisplayName()));
         nodeAction.setInProgress(true);
         
         try {
             Proc proc = procStarter.start();
             int retCode = proc.join();
+            LOGGER.log(Level.FINER, String.format("Runner %s finished with exit code %3d", nodeAction.getDisplayName(), retCode));
         } catch(IOException e) {
-            //TODO log errors
+            LOGGER.log(Level.INFO, String.format("Node runner %s failed", nodeAction.getDisplayName()), e);
         } catch(InterruptedException e) {
-          //TODO log errors
+            LOGGER.log(Level.INFO, String.format("Node runner %s failed", nodeAction.getDisplayName()), e);
         }
         
         nodeAction.setInProgress(false);
