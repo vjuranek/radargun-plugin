@@ -106,7 +106,7 @@ public class RadarGunBuilder extends Builder {
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
             String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript,
-                    String.valueOf(i + 1), buildJvmOptions(slave)); // TODO do we want to start slave index from zero?
+                    String.valueOf(i), buildJvmOptions(slave));
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
