@@ -21,8 +21,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +39,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class RadarGunBuilder extends Builder {
-    
+
     private static Logger LOGGER = Logger.getLogger(RadarGunBuilder.class.getName());
 
     private final String radarGunName;
@@ -85,8 +87,8 @@ public class RadarGunBuilder extends Builder {
         String rgSlaveScript = rgInstall.getExecutable(RadarGunExecutable.SLAVE, launcher.getChannel());
 
         NodeList nodes = nodeSource.getNodesList();
-        List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>();
-
+        List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
+        
         // master start script
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
                 "RadarGun master ");
@@ -104,32 +106,47 @@ public class RadarGunBuilder extends Builder {
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
             String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript,
-                    String.valueOf(i+1), buildJvmOptions(slave)); //TODO do we want to start slave index from zero?
+                    String.valueOf(i + 1), buildJvmOptions(slave)); // TODO do we want to start slave index from zero?
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
 
         // run all start scripts and wait for completion
-        runRGNodes(nodeRunners);
-
-        // TODO correct return value based on return values of scheduled scripts
-        return true;
+        // TODO set build to warning if some
+        return runRGNodes(nodeRunners);
     }
 
-    private void runRGNodes(List<NodeRunner> nodeRunners) throws AbortException {
-        CountDownLatch latch = new CountDownLatch(nodeRunners.size());
-        ExecutorService executorService = Executors.newFixedThreadPool(nodeRunners.size());
+    private boolean runRGNodes(List<NodeRunner> nodeRunners) throws AbortException {
+        int nodeCount = nodeRunners.size();
+        CountDownLatch latch = new CountDownLatch(nodeCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(nodeCount);
+
+        // submit runners
+        List<Future<Integer>> nodeRetCodes = new ArrayList<Future<Integer>>(nodeCount);
         for (NodeRunner runner : nodeRunners) {
             runner.setLatch(latch);
-            executorService.submit(runner);
+            nodeRetCodes.add(executorService.submit(runner));
         }
+
+        boolean isSuccess = true;
         // wait for processes to be finished
         try {
             latch.await();
+            for(Future<Integer> retCode : nodeRetCodes) {
+                if(retCode.get() != 0) {
+                    isSuccess = false;
+                    break;
+                }
+            }
         } catch (InterruptedException e) {
             LOGGER.log(Level.INFO, "Failing the build - build interrupted", e);
             throw new AbortException(e.getMessage());
+        } catch (ExecutionException e) {
+            LOGGER.log(Level.INFO, "Failing the build - getting master result has failed", e);
+            throw new AbortException(e.getMessage());
         }
+
+        return isSuccess;
     }
 
     private String buildJvmOptions(Node node) {
