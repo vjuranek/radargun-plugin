@@ -4,8 +4,10 @@ import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Launcher.ProcStarter;
+import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.StreamBuildListener;
 import hudson.model.AbstractBuild;
@@ -35,6 +37,7 @@ import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
 import org.jenkinsci.plugins.radargun.model.Node;
 import org.jenkinsci.plugins.radargun.model.NodeList;
+import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -47,15 +50,17 @@ public class RadarGunBuilder extends Builder {
     private final NodeSource nodeSource;
     private final ScriptSource scriptSource;
     private final String defaultJvmArgs;
+    private final String workspacePath;
 
     @DataBoundConstructor
     public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeSource nodeSource,
-            ScriptSource scriptSource, String defaultJvmArgs) {
+            ScriptSource scriptSource, String defaultJvmArgs, String workspacePath) {
         this.radarGunName = radarGunName;
         this.scenarioSource = scenarioSource;
         this.nodeSource = nodeSource;
         this.scriptSource = scriptSource;
         this.defaultJvmArgs = defaultJvmArgs;
+        this.workspacePath = Util.fixEmpty(workspacePath);
     }
 
     public String getRadarGunName() {
@@ -78,6 +83,10 @@ public class RadarGunBuilder extends Builder {
         return defaultJvmArgs;
     }
 
+    public String getWorkspacePath() {
+        return workspacePath;
+    }
+
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
@@ -88,7 +97,7 @@ public class RadarGunBuilder extends Builder {
 
         NodeList nodes = nodeSource.getNodesList();
         List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
-        
+
         // master start script
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
                 "RadarGun master ");
@@ -105,8 +114,8 @@ public class RadarGunBuilder extends Builder {
             Node slave = slaves.get(i);
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
-            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript,
-                    String.valueOf(i), buildJvmOptions(slave));
+            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript, String.valueOf(i),
+                    buildJvmOptions(slave));
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
@@ -132,8 +141,8 @@ public class RadarGunBuilder extends Builder {
         // wait for processes to be finished
         try {
             latch.await();
-            for(Future<Integer> retCode : nodeRetCodes) {
-                if(retCode.get() != 0) {
+            for (Future<Integer> retCode : nodeRetCodes) {
+                if (retCode.get() != 0) {
                     isSuccess = false;
                     break;
                 }
@@ -157,8 +166,10 @@ public class RadarGunBuilder extends Builder {
     private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)
             throws IOException, InterruptedException {
         BuildListener logListener = new StreamBuildListener(log, Charset.defaultCharset());
+        FilePath workspace = workspacePath == null ? build.getWorkspace() : new FilePath(new File(Resolver.buildVar(
+                build, workspacePath)));
         ProcStarter procStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(logListener))
-                .pwd(build.getWorkspace()).stdout(logListener);
+                .pwd(workspace).stdout(logListener);
         return procStarter;
     }
 
