@@ -104,7 +104,7 @@ public class RadarGunBuilder extends Builder {
         build.addAction(masterAction);
         String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(), rgMasterScript,
                 scenarioSource.getTmpScenarioPath(build), Integer.toString(nodes.getSlaveCount()),
-                buildJvmOptions(nodes.getMaster()));
+                buildJvmOptions(build, nodes.getMaster()));
         ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
         nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
 
@@ -115,7 +115,7 @@ public class RadarGunBuilder extends Builder {
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
             String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript, String.valueOf(i),
-                    buildJvmOptions(slave));
+                    buildJvmOptions(build, slave));
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
@@ -158,9 +158,11 @@ public class RadarGunBuilder extends Builder {
         return isSuccess;
     }
 
-    private String buildJvmOptions(Node node) {
-        return node.getJvmOptions() == null ? defaultJvmArgs : String.format("%s %s", defaultJvmArgs,
-                node.getJvmOptions());
+    private String buildJvmOptions(AbstractBuild<?,?> build, Node node) {
+        String nodeJvmOpts = Resolver.buildVar(build, node.getJvmOptions());
+        String defaultOptsRes = Resolver.buildVar(build, defaultJvmArgs);
+        return nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes,
+                nodeJvmOpts);
     }
 
     private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)
