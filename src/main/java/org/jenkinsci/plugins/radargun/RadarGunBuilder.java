@@ -49,16 +49,18 @@ public class RadarGunBuilder extends Builder {
     private final ScenarioSource scenarioSource;
     private final NodeSource nodeSource;
     private final ScriptSource scriptSource;
+    private final String log4jConfig;
     private final String defaultJvmArgs;
     private final String workspacePath;
 
     @DataBoundConstructor
     public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeSource nodeSource,
-            ScriptSource scriptSource, String defaultJvmArgs, String workspacePath) {
+            ScriptSource scriptSource, String log4jConfig, String defaultJvmArgs, String workspacePath) {
         this.radarGunName = radarGunName;
         this.scenarioSource = scenarioSource;
         this.nodeSource = nodeSource;
         this.scriptSource = scriptSource;
+        this.log4jConfig = Util.fixEmpty(log4jConfig);
         this.defaultJvmArgs = defaultJvmArgs;
         this.workspacePath = Util.fixEmpty(workspacePath);
     }
@@ -77,6 +79,10 @@ public class RadarGunBuilder extends Builder {
 
     public ScriptSource getScriptSource() {
         return scriptSource;
+    }
+
+    public String getLog4jConfig() {
+        return log4jConfig;
     }
 
     public String getDefaultJvmArgs() {
@@ -158,11 +164,12 @@ public class RadarGunBuilder extends Builder {
         return isSuccess;
     }
 
-    private String buildJvmOptions(AbstractBuild<?,?> build, Node node) {
+    private String buildJvmOptions(AbstractBuild<?, ?> build, Node node) {
         String nodeJvmOpts = Resolver.buildVar(build, node.getJvmOptions());
-        String defaultOptsRes = Resolver.buildVar(build, defaultJvmArgs);
-        return nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes,
-                nodeJvmOpts);
+        String log4jConf = Resolver.buildVar(build, log4jConfig);
+        String log4jConfOpt = log4jConf == null ? "" : String.format("%s%s", "-Dlog4j.configuration=", log4jConf);
+        String defaultOptsRes = String.format("%s %s", Resolver.buildVar(build, defaultJvmArgs), log4jConfOpt);
+        return nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes, nodeJvmOpts);
     }
 
     private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)
