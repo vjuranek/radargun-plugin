@@ -1,6 +1,9 @@
 package org.jenkinsci.plugins.radargun.config;
 
 import hudson.Extension;
+import hudson.FilePath;
+
+import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -28,15 +31,19 @@ public class TextScriptSource extends ScriptSource {
     public String getSlaveScript() {
         return slaveScript;
     }
-    
-    public String getMasterScriptPath() {
-        return null;
+
+    @Override
+    public String getMasterScriptPath(FilePath workspace) throws InterruptedException, IOException {
+        FilePath master = workspace.createTextTempFile("radargun_master", ".sh", masterScript, true);
+        return master.getRemote();
     }
-    
-    public String getSlaveScriptPath() {
-        return null;
+
+    @Override
+    public String getSlaveScriptPath(FilePath workspace) throws InterruptedException, IOException {
+        FilePath slave = workspace.createTextTempFile("radargun_slave", ".sh", slaveScript, true);
+        return slave.getRemote();
     }
-    
+
     @Extension
     public static class DescriptorImpl extends ScriptSourceDescriptor {
         public String getDisplayName() {

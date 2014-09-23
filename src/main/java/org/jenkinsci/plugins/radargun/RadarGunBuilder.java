@@ -108,8 +108,8 @@ public class RadarGunBuilder extends Builder {
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
                 "RadarGun master ");
         build.addAction(masterAction);
-        String[] masterCmdLine = scriptSource.getMasterCmdLine(nodes.getMaster().getHostname(), rgMasterScript,
-                scenarioSource.getTmpScenarioPath(build), Integer.toString(nodes.getSlaveCount()),
+        String[] masterCmdLine = scriptSource.getMasterCmdLine(build.getWorkspace(), nodes.getMaster().getHostname(),
+                rgMasterScript, scenarioSource.getTmpScenarioPath(build), Integer.toString(nodes.getSlaveCount()),
                 buildJvmOptions(build, nodes.getMaster()));
         ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
         nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
@@ -120,8 +120,8 @@ public class RadarGunBuilder extends Builder {
             Node slave = slaves.get(i);
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
-            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(slave.getHostname(), rgSlaveScript, String.valueOf(i),
-                    buildJvmOptions(build, slave));
+            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave.getHostname(),
+                    rgSlaveScript, String.valueOf(i), buildJvmOptions(build, slave));
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }

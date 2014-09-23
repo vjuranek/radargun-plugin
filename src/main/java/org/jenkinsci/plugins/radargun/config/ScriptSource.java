@@ -1,6 +1,9 @@
 package org.jenkinsci.plugins.radargun.config;
 
+import java.io.IOException;
+
 import hudson.DescriptorExtensionList;
+import hudson.FilePath;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
@@ -13,9 +16,9 @@ import jenkins.model.Jenkins;
  */
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
-    public abstract String getMasterScriptPath();
+    public abstract String getMasterScriptPath(FilePath workspace) throws InterruptedException, IOException;
 
-    public abstract String getSlaveScriptPath();
+    public abstract String getSlaveScriptPath(FilePath workspace) throws InterruptedException, IOException;
 
     /**
      * Prepares command line which will be used to start master process
@@ -30,12 +33,12 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
      *            additional JVM options for master process
      * 
      */
-    public String[] getMasterCmdLine(String hostname, String rgMasterScript, String scenarioPath, String slaveNumber,
-            String jvmOpts) {
+    public String[] getMasterCmdLine(FilePath workspace, String hostname, String rgMasterScript, String scenarioPath, String slaveNumber,
+            String jvmOpts) throws InterruptedException, IOException {
         // Run with "tail" option ("-t") not to finish immediately once the RG process is started.
         // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
         // And also to gather the log from master
-        return new String[] { getMasterScriptPath(), hostname, rgMasterScript , "-t", "-w", scenarioPath, slaveNumber, jvmOpts };
+        return new String[] { getMasterScriptPath(workspace), hostname, rgMasterScript , "-t", "-w", scenarioPath, slaveNumber, jvmOpts };
     }
 
     /**
@@ -51,9 +54,9 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
      *            additional JVM options for master process           
      * 
      */
-    public String[] getSlaveCmdLine(String hostname, String rgSlaveScript, String slaveIndex, String jvmOpts) {
+    public String[] getSlaveCmdLine(FilePath workspace, String hostname, String rgSlaveScript, String slaveIndex, String jvmOpts) throws InterruptedException, IOException {
         // run with "tail" option ("-t") to gather the logs from slaves
-        return new String[] { getSlaveScriptPath(), hostname, rgSlaveScript, "-t", "-w", slaveIndex, jvmOpts };
+        return new String[] { getSlaveScriptPath(workspace), hostname, rgSlaveScript, "-t", "-w", slaveIndex, jvmOpts };
     }
 
     @Override

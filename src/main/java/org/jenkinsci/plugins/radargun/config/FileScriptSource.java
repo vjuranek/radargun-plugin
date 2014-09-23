@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.radargun.config;
 
 import hudson.Extension;
+import hudson.FilePath;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -24,16 +25,18 @@ public class FileScriptSource extends ScriptSource {
     public String getMasterPath() {
         return mastertPath;
     }
-    
+
     public String getSlavePath() {
         return slavePath;
     }
-    
-    public String getMasterScriptPath() {
+
+    @Override
+    public String getMasterScriptPath(FilePath workspace) {
         return mastertPath;
     }
-    
-    public String getSlaveScriptPath() {
+
+    @Override
+    public String getSlaveScriptPath(FilePath workspace) {
         return slavePath;
     }
 
