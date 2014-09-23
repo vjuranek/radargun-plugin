@@ -8,27 +8,32 @@ import java.io.IOException;
 /**
  * 
  * @author vjuranek
- *
+ * 
  */
 public class Functions {
 
-    public static String convertWsToCanonicalPath(FilePath workspace){
+    public static String convertWsToCanonicalPath(FilePath workspace) {
         String workspacePath = "";
         try {
             workspacePath = (new File(workspace.toURI())).getCanonicalPath();
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } catch (InterruptedException e){
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         return workspacePath;
     }
-    
-    public static String cmdArrayToString(String[] cmds){
+
+    public static String cmdArrayToString(String[] cmds) {
         StringBuilder buf = new StringBuilder();
         for (String c : cmds) {
             buf.append(c).append(" ");
         }
-        return buf.substring(0, buf.length()-1);
+        return buf.substring(0, buf.length() - 1);
+    }
+
+    public static void makeExecutable(String filePath) {
+        File msf = new File(filePath);
+        msf.setExecutable(true);
     }
 }

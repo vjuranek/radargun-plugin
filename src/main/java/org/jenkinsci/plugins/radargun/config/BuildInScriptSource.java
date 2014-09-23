@@ -3,8 +3,6 @@ package org.jenkinsci.plugins.radargun.config;
 import hudson.Extension;
 import hudson.FilePath;
 
-import java.io.File;
-
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -23,11 +21,6 @@ public class BuildInScriptSource extends ScriptSource {
             SCRIPT_DIR + MASTER_SCRIPT_NAME).getPath();
     private static final String SLAVE_SCRIPT_PATH = BuildInScriptSource.class.getResource(
             SCRIPT_DIR + SLAVE_SCRIPT_NAME).getPath();
-
-    static {
-        new File(MASTER_SCRIPT_PATH).setExecutable(true);
-        new File(SLAVE_SCRIPT_PATH).setExecutable(true);
-    }
 
     @DataBoundConstructor
     public BuildInScriptSource() {
