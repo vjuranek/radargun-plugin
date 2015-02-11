@@ -3,8 +3,8 @@ package org.jenkinsci.plugins.radargun.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jenkinsci.plugins.radargun.model.Node;
-import org.jenkinsci.plugins.radargun.model.NodeList;
+import org.jenkinsci.plugins.radargun.model.impl.Node;
+import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 
 public class ParseUtils {
 

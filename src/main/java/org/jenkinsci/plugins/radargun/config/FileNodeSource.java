@@ -6,7 +6,7 @@ import hudson.FilePath;
 import java.io.File;
 import java.io.IOException;
 
-import org.jenkinsci.plugins.radargun.model.NodeList;
+import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 

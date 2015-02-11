@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.radargun.model;
+package org.jenkinsci.plugins.radargun.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
