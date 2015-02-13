@@ -2,7 +2,7 @@ package org.jenkinsci.plugins.radargun.config;
 
 import hudson.Extension;
 
-import org.jenkinsci.plugins.radargun.model.NodeList;
+import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 

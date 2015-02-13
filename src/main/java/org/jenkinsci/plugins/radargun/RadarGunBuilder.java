@@ -56,10 +56,14 @@ public class RadarGunBuilder extends Builder {
     private final String log4jConfig;
     private final String defaultJvmArgs;
     private final String workspacePath;
+    private final String pluginPath;
+    private final String pluginConfigPath;
+    private final String reporterPath;
 
     @DataBoundConstructor
     public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeSource nodeSource,
-            ScriptSource scriptSource, String log4jConfig, String defaultJvmArgs, String workspacePath) {
+            ScriptSource scriptSource, String log4jConfig, String defaultJvmArgs, String workspacePath,
+            String pluginPath, String pluginConfigPath, String reporterPath) {
         this.radarGunName = radarGunName;
         this.scenarioSource = scenarioSource;
         this.nodeSource = nodeSource;
@@ -67,6 +71,9 @@ public class RadarGunBuilder extends Builder {
         this.log4jConfig = Util.fixEmpty(log4jConfig);
         this.defaultJvmArgs = defaultJvmArgs;
         this.workspacePath = Util.fixEmpty(workspacePath);
+        this.pluginPath = pluginPath;
+        this.pluginConfigPath = pluginConfigPath;
+        this.reporterPath = reporterPath;
     }
 
     public String getRadarGunName() {
@@ -97,6 +104,18 @@ public class RadarGunBuilder extends Builder {
         return workspacePath;
     }
 
+    public String getPluginPath() {
+        return pluginPath;
+    }
+
+    public String getConfigPath() {
+        return pluginConfigPath;
+    }
+
+    public String getReporterPath() {
+        return reporterPath;
+    }
+
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
@@ -109,15 +128,22 @@ public class RadarGunBuilder extends Builder {
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
                 "RadarGun master ");
         build.addAction(masterAction);
-        
+
         MasterScriptConfig masterConfig = new MasterShellScript();
-        masterConfig.withNumberOfSlaves(nodes.getSlaveCount())
-            .withConfigPath(scenarioSource.getTmpScenarioPath(build))
-            .withScriptPath(rgInstall.getExecutable(masterConfig, launcher.getChannel()));
-        
+        masterConfig.withNumberOfSlaves(nodes.getSlaveCount()).withConfigPath(scenarioSource.getTmpScenarioPath(build))
+                .withScriptPath(rgInstall.getExecutable(masterConfig, launcher.getChannel()));
+        if(pluginPath != null && !pluginPath.isEmpty()) {
+            masterConfig.withPlugin(pluginPath);
+            if(pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
+                masterConfig.withPluginConfig(pluginConfigPath);
+            }
+        }
+        if(reporterPath != null && !reporterPath.isEmpty())
+            masterConfig.withReporter(reporterPath);
+
         String[] masterCmdLine = scriptSource.getMasterCmdLine(build.getWorkspace(), nodes.getMaster().getHostname(),
                 masterConfig, buildJvmOptions(build, nodes.getMaster()));
-        
+
         ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
         nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
 
@@ -127,11 +153,16 @@ public class RadarGunBuilder extends Builder {
             Node slave = slaves.get(i);
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
-            
+
             SlaveScriptConfig slaveConfig = new SlaveShellScript();
-            slaveConfig.withSlaveIndex(i)
-                .withScriptPath(rgInstall.getExecutable(slaveConfig, launcher.getChannel()));
-            
+            slaveConfig.withSlaveIndex(i).withScriptPath(rgInstall.getExecutable(slaveConfig, launcher.getChannel()));
+            if(pluginPath != null && !pluginPath.isEmpty()) {
+                slaveConfig.withPlugin(pluginPath);
+                if(pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
+                    slaveConfig.withPluginConfig(pluginConfigPath);
+                }
+            }
+
             String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave.getHostname(),
                     slaveConfig, buildJvmOptions(build, slave));
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
@@ -181,7 +212,7 @@ public class RadarGunBuilder extends Builder {
         String log4jConf = Resolver.buildVar(build, log4jConfig);
         String log4jConfOpt = log4jConf == null ? "" : String.format("%s%s", "-Dlog4j.configuration=", log4jConf);
         String defaultOptsRes = String.format("%s %s", Resolver.buildVar(build, defaultJvmArgs), log4jConfOpt);
-        String jvmOpts =  nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes, nodeJvmOpts);
+        String jvmOpts = nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes, nodeJvmOpts);
         return jvmOpts.trim();
     }
 

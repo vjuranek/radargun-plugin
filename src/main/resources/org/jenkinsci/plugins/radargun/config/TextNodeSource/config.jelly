@@ -2,7 +2,7 @@
     xmlns:f="/lib/form">
 
     <f:entry field="nodes">
-        <f:textarea />    
+        <f:textarea />
     </f:entry>
 
 </j:jelly>

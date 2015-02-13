@@ -7,12 +7,12 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
 
-import org.jenkinsci.plugins.radargun.model.NodeList;
+import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 
 public abstract class NodeSource implements Describable<NodeSource> {
-    
+
     public abstract NodeList getNodesList() throws IOException;
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public Descriptor<NodeSource> getDescriptor() {

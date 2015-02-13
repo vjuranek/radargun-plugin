@@ -51,6 +51,18 @@
         <f:entry title="Workspace path" field="workspacePath" description="Path to working directory on master and slaves">
             <f:textbox />
         </f:entry>
+        
+        <f:entry field="pluginPath" title="Plugin path" >
+            <f:textbox />
+        </f:entry>
+        
+        <f:entry field="pluginConfigPath" title="Plugin config path">
+            <f:textbox />
+        </f:entry>
+        
+        <f:entry field="reporterPath" title="Reporter path">
+            <f:textbox />
+        </f:entry>
     </f:advanced>
 
 </j:jelly>
