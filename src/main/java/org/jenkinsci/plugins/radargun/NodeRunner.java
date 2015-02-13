@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.radargun;
 import hudson.Launcher.ProcStarter;
 import hudson.Proc;
 
-import java.io.IOException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -36,14 +35,12 @@ public class NodeRunner implements Callable<Integer> {
             Proc proc = procStarter.start();
             retCode = proc.join();
             LOGGER.log(Level.FINER, String.format("Runner %s finished with exit code %3d", nodeAction.getDisplayName(), retCode));
-        } catch(IOException e) {
+        } catch(Exception e) {
             LOGGER.log(Level.INFO, String.format("Node runner %s failed", nodeAction.getDisplayName()), e);
-        } catch(InterruptedException e) {
-            LOGGER.log(Level.INFO, String.format("Node runner %s failed", nodeAction.getDisplayName()), e);
+        } finally {
+            nodeAction.setInProgress(false);
+            latch.countDown();
         }
-        
-        nodeAction.setInProgress(false);
-        latch.countDown(); 
         return retCode;
     }
 

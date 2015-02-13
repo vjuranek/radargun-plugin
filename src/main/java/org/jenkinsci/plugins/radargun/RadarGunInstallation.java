@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.radargun;
 
+import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Util;
@@ -60,7 +61,11 @@ public class RadarGunInstallation extends ToolInstallation implements Environmen
                 if (exec.exists()) {
                     return exec.getPath();
                 }
-                return null;
+                //abort build if we cannot locate RG executables
+                throw new AbortException(
+                        String.format(
+                                "Cannot resolver path to executable %s, something wrong with your RG installation? Exiting ... ",
+                                executable.getScriptName()));
             }
         });
     }
