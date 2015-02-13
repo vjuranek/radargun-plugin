@@ -108,7 +108,7 @@ public class RadarGunBuilder extends Builder {
         return pluginPath;
     }
 
-    public String getConfigPath() {
+    public String getPluginConfigPath() {
         return pluginConfigPath;
     }
 
