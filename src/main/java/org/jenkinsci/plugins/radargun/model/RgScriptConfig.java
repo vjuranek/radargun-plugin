@@ -36,7 +36,7 @@ public interface RgScriptConfig {
     /**
      * 
      * @param scriptPath
-     *            Full path to the script, does <b>not</b> include script name itself
+     *            Full path to the script, <b>does</b> include script name itself
      */
     public RgScriptConfig withScriptPath(String scriptPath);
 

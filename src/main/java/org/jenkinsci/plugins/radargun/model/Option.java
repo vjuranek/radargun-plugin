@@ -33,15 +33,17 @@ public class Option {
         List<String> options = new ArrayList<String>();
 
         try {
-            if (hasOptionValue()) {
-                options.add(getOptionSwitch());
-                Method m = cfg.getClass().getMethod(getGetterName());
-                options.add((String) m.invoke(cfg));
-
-            } else { // no value for this switch, getter should be boolean
-                Method m = cfg.getClass().getMethod(getGetterName());
-                if ((boolean) m.invoke(cfg))
+            Method m = cfg.getClass().getMethod(getGetterName());
+            Object val = m.invoke(cfg);
+            if (val != null) {
+                if (hasOptionValue()) {
                     options.add(getOptionSwitch());
+                    options.add(val.toString());
+
+                } else { // no value for this switch, getter should be boolean
+                    if (((Boolean) val).booleanValue())
+                        options.add(getOptionSwitch());
+                }
             }
         } catch (NoSuchMethodException e) {
             throw new IllegalArgumentException(String.format("Cannot obtain value for switch %s", getOptionSwitch()),

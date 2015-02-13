@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.radargun.model.impl;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.jenkinsci.plugins.radargun.model.RgScriptConfig;
 
 /**
@@ -36,7 +35,8 @@ public abstract class RgShellScript implements RgScriptConfig {
     
     @Override
     public String[] getScriptCmd() {
-        return (String[])ArrayUtils.addAll(getInterpreter(), new String[] {getScriptName()});
+        //return (String[])ArrayUtils.add(getInterpreter(), getScriptPath());
+        return new String[] {getScriptPath()};
     }
     
 }

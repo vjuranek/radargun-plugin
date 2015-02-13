@@ -21,6 +21,7 @@ import java.util.List;
 
 import jenkins.model.Jenkins;
 
+import org.jenkinsci.plugins.radargun.model.RgScriptConfig;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -50,7 +51,7 @@ public class RadarGunInstallation extends ToolInstallation implements Environmen
     /**
      * Gets the executable path of this RadarGun installation on the given target system.
      */
-    public String getExecutable(final RadarGunExecutable executable, VirtualChannel channel) throws IOException,
+    public String getExecutable(final RgScriptConfig executable, VirtualChannel channel) throws IOException,
             InterruptedException {
         return channel.call(new Callable<String, IOException>() {
 
@@ -64,11 +65,11 @@ public class RadarGunInstallation extends ToolInstallation implements Environmen
         });
     }
 
-    private File getExeFile(RadarGunExecutable executable) {
+    private File getExeFile(final RgScriptConfig executable) {
         // TODO expand installation with t.translate(node, EnvVars.getRemote(checkChannel()))
-        String groovyHome = Util.replaceMacro(getHome(), EnvVars.masterEnvVars); // TODO - env var on slave??
-        File binDir = new File(groovyHome, "bin");
-        return new File(binDir, executable.getFileName());
+        String rgHome = Util.replaceMacro(getHome(), EnvVars.masterEnvVars); // TODO - env var on slave??
+        File binDir = new File(rgHome, "bin");
+        return new File(binDir, executable.getScriptName());
     }
 
     @Extension

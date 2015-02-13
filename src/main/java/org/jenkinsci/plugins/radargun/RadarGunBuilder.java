@@ -35,8 +35,12 @@ import net.sf.json.JSONObject;
 import org.jenkinsci.plugins.radargun.config.NodeSource;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
+import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
+import org.jenkinsci.plugins.radargun.model.SlaveScriptConfig;
+import org.jenkinsci.plugins.radargun.model.impl.MasterShellScript;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
+import org.jenkinsci.plugins.radargun.model.impl.SlaveShellScript;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -97,20 +101,23 @@ public class RadarGunBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
 
-        RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
-        String rgMasterScript = rgInstall.getExecutable(RadarGunExecutable.MASTER, launcher.getChannel());
-        String rgSlaveScript = rgInstall.getExecutable(RadarGunExecutable.SLAVE, launcher.getChannel());
-
         NodeList nodes = nodeSource.getNodesList();
         List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
+        RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
 
         // master start script
         RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
                 "RadarGun master ");
         build.addAction(masterAction);
+        
+        MasterScriptConfig masterConfig = new MasterShellScript();
+        masterConfig.withNumberOfSlaves(nodes.getSlaveCount())
+            .withConfigPath(scenarioSource.getTmpScenarioPath(build))
+            .withScriptPath(rgInstall.getExecutable(masterConfig, launcher.getChannel()));
+        
         String[] masterCmdLine = scriptSource.getMasterCmdLine(build.getWorkspace(), nodes.getMaster().getHostname(),
-                rgMasterScript, scenarioSource.getTmpScenarioPath(build), Integer.toString(nodes.getSlaveCount()),
-                buildJvmOptions(build, nodes.getMaster()));
+                masterConfig, buildJvmOptions(build, nodes.getMaster()));
+        
         ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
         nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
 
@@ -120,8 +127,13 @@ public class RadarGunBuilder extends Builder {
             Node slave = slaves.get(i);
             RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
             build.addAction(slaveAction);
+            
+            SlaveScriptConfig slaveConfig = new SlaveShellScript();
+            slaveConfig.withSlaveIndex(i)
+                .withScriptPath(rgInstall.getExecutable(slaveConfig, launcher.getChannel()));
+            
             String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave.getHostname(),
-                    rgSlaveScript, String.valueOf(i), buildJvmOptions(build, slave));
+                    slaveConfig, buildJvmOptions(build, slave));
             ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
             nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
@@ -169,7 +181,8 @@ public class RadarGunBuilder extends Builder {
         String log4jConf = Resolver.buildVar(build, log4jConfig);
         String log4jConfOpt = log4jConf == null ? "" : String.format("%s%s", "-Dlog4j.configuration=", log4jConf);
         String defaultOptsRes = String.format("%s %s", Resolver.buildVar(build, defaultJvmArgs), log4jConfOpt);
-        return nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes, nodeJvmOpts);
+        String jvmOpts =  nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes, nodeJvmOpts);
+        return jvmOpts.trim();
     }
 
     private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)

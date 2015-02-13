@@ -14,7 +14,8 @@ public abstract class NodeShellScript extends RgShellScript implements NodeScrip
     protected boolean wait;
     protected String plugin;
     protected String pluginConfig;
-
+    //protected String javaOpts;
+    
     @Override
     public abstract String getScriptName();
     
@@ -47,6 +48,11 @@ public abstract class NodeShellScript extends RgShellScript implements NodeScrip
     public String getPluginConfig() {
         return pluginConfig;
     }
+    
+    /*@Override
+    public String getJavaOpts() {
+        return javaOpts;
+    }*/
 
     @Override
     public NodeScriptConfig withMasterHost(String masterHostname) {
@@ -83,6 +89,12 @@ public abstract class NodeShellScript extends RgShellScript implements NodeScrip
         this.pluginConfig = pluginConfig;
         return this;
     }
+    
+    /*@Override
+    public NodeScriptConfig withJavaOpts(String javaOpts) {
+        this.javaOpts = javaOpts;
+        return this;
+    }*/
 
     @Override
     public String[] getScriptCmd() {

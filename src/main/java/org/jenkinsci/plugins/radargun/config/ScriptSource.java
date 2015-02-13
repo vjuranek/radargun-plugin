@@ -9,6 +9,10 @@ import java.io.IOException;
 
 import jenkins.model.Jenkins;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
+import org.jenkinsci.plugins.radargun.model.NodeScriptConfig;
+import org.jenkinsci.plugins.radargun.model.SlaveScriptConfig;
 import org.jenkinsci.plugins.radargun.util.Functions;
 
 /**
@@ -23,49 +27,28 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
 
     public abstract String getSlaveScriptPath(FilePath workspace) throws InterruptedException, IOException;
 
-    /**
-     * Prepares command line which will be used to start master process
-     * 
-     * @param hostname
-     *            master hostname (typically for ssh there)
-     * @param rgMasterScript
-     *            path to RG master.sh script on this machine
-     * @param scenarioPath
-     *            path to scenario to be executed
-     * @param jvmOpts
-     *            additional JVM options for master process
-     * 
-     */
-    public String[] getMasterCmdLine(FilePath workspace, String hostname, String rgMasterScript, String scenarioPath,
-            String slaveNumber, String jvmOpts) throws InterruptedException, IOException {
-        String masterScriptPath = getMasterScriptPath(workspace);
-        Functions.makeExecutable(masterScriptPath);
+    public String[] getNodeCmdLine(String nodeScriptPath, String hostname, NodeScriptConfig nodeScriptConfig, String jvmOpts) throws InterruptedException, IOException {
+        Functions.makeExecutable(nodeScriptPath);
         // Run with "tail" option ("-t") not to finish immediately once the RG process is started.
         // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
         // And also to gather the log from master
-        return new String[] { masterScriptPath, hostname, rgMasterScript, "-t", "-w", scenarioPath, slaveNumber,
-                jvmOpts };
+        nodeScriptConfig.withTailFollow().withWait();
+        String[] remoteExecScriptCmd =  new String[] { nodeScriptPath, hostname};
+        String[] remoteScript = (String[])ArrayUtils.addAll(remoteExecScriptCmd, nodeScriptConfig.getScriptCmd());
+        if(jvmOpts != null && !jvmOpts.isEmpty()) {
+            remoteScript = (String[]) ArrayUtils.addAll(remoteScript, new String[] {"-J", jvmOpts});
+        }
+        return remoteScript;
     }
-
-    /**
-     * Prepares command line which will be used to start slave process
-     * 
-     * @param hostname
-     *            slave hostname (typically for ssh there)
-     * @param rgSlaveScript
-     *            path to RG slave.sh script on this machine
-     * @param slaveIndex
-     *            slave index
-     * @param jvmOpts
-     *            additional JVM options for master process
-     * 
-     */
-    public String[] getSlaveCmdLine(FilePath workspace, String hostname, String rgSlaveScript, String slaveIndex,
-            String jvmOpts) throws InterruptedException, IOException {
+    
+    public String[] getMasterCmdLine(FilePath workspace, String hostname, MasterScriptConfig nodeScriptConfig, String jvmOpts) throws InterruptedException, IOException {
+        String masterScriptPath = getMasterScriptPath(workspace);
+        return getNodeCmdLine(masterScriptPath, hostname, nodeScriptConfig, jvmOpts);
+    }
+    
+    public String[] getSlaveCmdLine(FilePath workspace, String hostname, SlaveScriptConfig nodeScriptConfig, String jvmOpts) throws InterruptedException, IOException {
         String slaveScriptPath = getSlaveScriptPath(workspace);
-        Functions.makeExecutable(slaveScriptPath);
-        // run with "tail" option ("-t") to gather the logs from slaves
-        return new String[] { slaveScriptPath, hostname, rgSlaveScript, "-t", "-w", slaveIndex, jvmOpts };
+        return getNodeCmdLine(slaveScriptPath, hostname, nodeScriptConfig, jvmOpts);
     }
 
     @Override

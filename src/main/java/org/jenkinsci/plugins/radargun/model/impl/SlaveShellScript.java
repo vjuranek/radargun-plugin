@@ -48,7 +48,7 @@ public class SlaveShellScript extends NodeShellScript implements SlaveScriptConf
     
     private String[] optionToArray() {
         List<String> opts = new ArrayList<String>();
-        for(MasterScriptConfig.Options o : MasterScriptConfig.Options.values()) {
+        for(SlaveScriptConfig.Options o : SlaveScriptConfig.Options.values()) {
             opts.addAll(o.getOption().getCmdOption(this));
         }
         return opts.toArray(new String[opts.size()]);
