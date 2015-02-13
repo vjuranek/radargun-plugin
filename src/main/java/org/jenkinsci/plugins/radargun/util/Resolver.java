@@ -16,6 +16,16 @@ import java.util.logging.Logger;
  * 
  */
 public class Resolver {
+    
+    private final AbstractBuild<?, ?> build;
+    
+    public Resolver(final AbstractBuild<?, ?> build) {
+        this.build = build;
+    }
+    
+    public String doResolve(final String toResolve) {
+        return buildVar(build, toResolve);
+    }
 
     public static String buildVar(final AbstractBuild<?, ?> build,final String toResolve) {
         if(toResolve == null)

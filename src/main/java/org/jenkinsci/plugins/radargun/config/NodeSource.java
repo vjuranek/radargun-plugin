@@ -1,17 +1,19 @@
 package org.jenkinsci.plugins.radargun.config;
 
-import java.io.IOException;
-
 import hudson.DescriptorExtensionList;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+
+import java.io.IOException;
+
 import jenkins.model.Jenkins;
 
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
+import org.jenkinsci.plugins.radargun.util.Resolver;
 
 public abstract class NodeSource implements Describable<NodeSource> {
 
-    public abstract NodeList getNodesList() throws IOException;
+    public abstract NodeList getNodesList(Resolver resolver) throws IOException;
 
     @Override
     @SuppressWarnings("unchecked")

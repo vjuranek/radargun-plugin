@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
+import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class FileNodeSource extends NodeSource {
@@ -24,9 +25,9 @@ public class FileNodeSource extends NodeSource {
     }
     
     @Override
-    public NodeList getNodesList() throws IOException {
-        //String path = Resolver.buildVar(build, nodeListPath);  //TODO resolve build variables in path
-        FilePath fp = new FilePath(new File(nodeListPath));
+    public NodeList getNodesList(Resolver resolver) throws IOException {
+        String nodeListPathRes = resolver.doResolve(nodeListPath);
+        FilePath fp = new FilePath(new File(nodeListPathRes));
         String nodes = fp.readToString();
         return ParseUtils.parseNodeList(nodes);
     }

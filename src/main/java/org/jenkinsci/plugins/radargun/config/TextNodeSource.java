@@ -4,6 +4,7 @@ import hudson.Extension;
 
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
+import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class TextNodeSource extends NodeSource {
@@ -20,7 +21,7 @@ public class TextNodeSource extends NodeSource {
     }
     
     @Override
-    public NodeList getNodesList() {
+    public NodeList getNodesList(Resolver resolver) {
         return ParseUtils.parseNodeList(nodes);
     }
     
