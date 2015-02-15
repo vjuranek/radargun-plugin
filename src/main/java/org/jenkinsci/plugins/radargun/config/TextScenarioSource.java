@@ -27,7 +27,8 @@ public class TextScenarioSource extends ScenarioSource {
         return scenario;
     }
 
-    public FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
+    @Override
+    protected FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
         return tmpScenarioFromContent(scenario, build);
     }
 

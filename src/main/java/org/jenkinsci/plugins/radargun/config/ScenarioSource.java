@@ -24,12 +24,13 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
     protected static final String DEFAULT_SCENARIO_SUFFIX = ".xml";
 
     private transient String tmpScenarioPath;
+    private transient FilePath tmpScenario;
 
-    public abstract FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException;
+    protected abstract FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException;
 
     public String getTmpScenarioPath(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
         if (tmpScenarioPath == null) {
-            FilePath tmpScenario = createTmpScenrioFile(build);
+            tmpScenario = createTmpScenrioFile(build);
             tmpScenarioPath = tmpScenario.getRemote();
         }
         return tmpScenarioPath;
@@ -55,6 +56,10 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
                                                     // huge file
         // TODO env. var expansion? Expand on node where it will be launched
         return tmpScenarioFromContent(scenarioContent, build);
+    }
+    
+    public void cleanup() throws InterruptedException, IOException {
+        tmpScenario.delete();
     }
 
     @Override

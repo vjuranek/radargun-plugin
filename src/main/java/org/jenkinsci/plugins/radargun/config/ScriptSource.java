@@ -26,6 +26,8 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
     public abstract String getMasterScriptPath(FilePath workspace) throws InterruptedException, IOException;
 
     public abstract String getSlaveScriptPath(FilePath workspace) throws InterruptedException, IOException;
+    
+    public abstract void cleanup() throws InterruptedException, IOException;
 
     public String[] getNodeCmdLine(String nodeScriptPath, String hostname, NodeScriptConfig nodeScriptConfig, String jvmOpts) throws InterruptedException, IOException {
         Functions.makeExecutable(nodeScriptPath);

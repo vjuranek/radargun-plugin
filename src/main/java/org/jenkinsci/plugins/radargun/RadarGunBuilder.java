@@ -122,59 +122,77 @@ public class RadarGunBuilder extends Builder {
 
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         build.addAction(new RadarGunInvisibleAction(rgInstall.getHome()));
-        
+
         Resolver resolver = new Resolver(build);
         NodeList nodes = nodeSource.getNodesList(resolver);
         List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
 
-        // master start script
-        RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
-                "RadarGun master ");
-        build.addAction(masterAction);
+        try {
+            // master start script
+            RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
+                    "RadarGun master ");
+            build.addAction(masterAction);
+            String[] masterCmdLine = getMasterCmdLine(build, launcher, nodes, rgInstall);
+            ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
+            nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
 
+            // slave start scripts
+            List<Node> slaves = nodes.getSlaves();
+            for (int i = 0; i < slaves.size(); i++) {
+                Node slave = slaves.get(i);
+                RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
+                build.addAction(slaveAction);
+
+                String[] slaveCmdLine = getSlaveCmdLine(build, launcher, slave, i, rgInstall);
+                ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
+                nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
+            }
+
+            // run all start scripts and wait for completion
+            // TODO set build to warning if some
+            return runRGNodes(nodeRunners);
+        } finally {
+            scriptSource.cleanup();
+            scenarioSource.cleanup();
+        }
+    }
+
+    private String[] getMasterCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes,
+            RadarGunInstallation rgInstall) throws InterruptedException, IOException {
         MasterScriptConfig masterConfig = new MasterShellScript();
         masterConfig.withNumberOfSlaves(nodes.getSlaveCount()).withConfigPath(scenarioSource.getTmpScenarioPath(build))
                 .withScriptPath(rgInstall.getExecutable(masterConfig, launcher.getChannel()));
-        if(pluginPath != null && !pluginPath.isEmpty()) {
+
+        if (pluginPath != null && !pluginPath.isEmpty()) {
             masterConfig.withPlugin(pluginPath);
-            if(pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
+            if (pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
                 masterConfig.withPluginConfig(pluginConfigPath);
             }
         }
-        if(reporterPath != null && !reporterPath.isEmpty())
+        if (reporterPath != null && !reporterPath.isEmpty())
             masterConfig.withReporter(reporterPath);
 
         String[] masterCmdLine = scriptSource.getMasterCmdLine(build.getWorkspace(), nodes.getMaster().getHostname(),
                 masterConfig, buildJvmOptions(build, nodes.getMaster()));
+        return masterCmdLine;
+    }
 
-        ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
-        nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
-
-        // slave start scripts
-        List<Node> slaves = nodes.getSlaves();
-        for (int i = 0; i < slaves.size(); i++) {
-            Node slave = slaves.get(i);
-            RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
-            build.addAction(slaveAction);
-
-            SlaveScriptConfig slaveConfig = new SlaveShellScript();
-            slaveConfig.withSlaveIndex(i).withScriptPath(rgInstall.getExecutable(slaveConfig, launcher.getChannel()));
-            if(pluginPath != null && !pluginPath.isEmpty()) {
-                slaveConfig.withPlugin(pluginPath);
-                if(pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
-                    slaveConfig.withPluginConfig(pluginConfigPath);
-                }
+    private String[] getSlaveCmdLine(AbstractBuild<?, ?> build, Launcher launcher, Node slave, int slaveIndex,
+            RadarGunInstallation rgInstall) throws InterruptedException, IOException {
+        SlaveScriptConfig slaveConfig = new SlaveShellScript();
+        slaveConfig.withSlaveIndex(slaveIndex).withScriptPath(
+                rgInstall.getExecutable(slaveConfig, launcher.getChannel()));
+        if (pluginPath != null && !pluginPath.isEmpty()) {
+            slaveConfig.withPlugin(pluginPath);
+            if (pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
+                slaveConfig.withPluginConfig(pluginConfigPath);
             }
-
-            String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave.getHostname(),
-                    slaveConfig, buildJvmOptions(build, slave));
-            ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
-            nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
         }
 
-        // run all start scripts and wait for completion
-        // TODO set build to warning if some
-        return runRGNodes(nodeRunners);
+        String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave.getHostname(), slaveConfig,
+                buildJvmOptions(build, slave));
+        return slaveCmdLine;
+
     }
 
     private boolean runRGNodes(List<NodeRunner> nodeRunners) throws AbortException {
@@ -205,7 +223,7 @@ public class RadarGunBuilder extends Builder {
         } catch (ExecutionException e) {
             LOGGER.log(Level.INFO, "Failing the build - getting master result has failed", e);
             throw new AbortException(e.getMessage());
-        } 
+        }
 
         return isSuccess;
     }

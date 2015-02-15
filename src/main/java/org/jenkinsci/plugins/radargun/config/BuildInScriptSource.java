@@ -37,6 +37,11 @@ public class BuildInScriptSource extends ScriptSource {
     public String getSlaveScriptPath(FilePath workspace) {
         return SLAVE_SCRIPT_PATH;
     }
+    
+    @Override
+    public void cleanup() {
+        // NO-OP
+    }
 
     @Extension
     public static class DescriptorImpl extends ScriptSourceDescriptor {

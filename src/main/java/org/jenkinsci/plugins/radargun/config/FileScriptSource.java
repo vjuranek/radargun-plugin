@@ -29,6 +29,11 @@ public class FileScriptSource extends ScriptSource {
     public String getSlavePath() {
         return slavePath;
     }
+    
+    @Override
+    public void cleanup() {
+        // NO-OP
+    }
 
     @Override
     public String getMasterScriptPath(FilePath workspace) {

@@ -17,11 +17,16 @@ public class TextScriptSource extends ScriptSource {
 
     private final String masterScript;
     private final String slaveScript;
+    
+    private transient FilePath masterScriptPath;
+    private transient FilePath slaveScriptPath;
 
     @DataBoundConstructor
     public TextScriptSource(String masterScript, String slaveScript) {
         this.masterScript = masterScript;
         this.slaveScript = slaveScript;
+        masterScriptPath = null;
+        slaveScriptPath = null;
     }
 
     public String getMasterScript() {
@@ -31,17 +36,38 @@ public class TextScriptSource extends ScriptSource {
     public String getSlaveScript() {
         return slaveScript;
     }
+    
+    @Override
+    public void cleanup() throws InterruptedException, IOException {
+        try {
+            masterScriptPath.delete();
+            slaveScriptPath.delete();
+        } finally {
+            masterScriptPath = null;
+            slaveScriptPath = null;
+        }
+    }
 
     @Override
     public String getMasterScriptPath(FilePath workspace) throws InterruptedException, IOException {
-        FilePath master = workspace.createTextTempFile("radargun_master", ".sh", masterScript, true);
-        return master.getRemote();
+        if(masterScriptPath == null)
+            masterScriptPath = createMasterScriptFile(workspace);
+        return masterScriptPath.getRemote();
     }
 
     @Override
     public String getSlaveScriptPath(FilePath workspace) throws InterruptedException, IOException {
-        FilePath slave = workspace.createTextTempFile("radargun_slave", ".sh", slaveScript, true);
-        return slave.getRemote();
+        if(slaveScriptPath == null)
+            slaveScriptPath = createSlaveScriptPath(workspace); 
+        return slaveScriptPath.getRemote();
+    }
+    
+    private FilePath createMasterScriptFile(FilePath workspace) throws InterruptedException, IOException {
+        return workspace.createTextTempFile("radargun_master", ".sh", masterScript, true);
+    }
+    
+    private FilePath createSlaveScriptPath(FilePath workspace) throws InterruptedException, IOException {
+        return workspace.createTextTempFile("radargun_slave", ".sh", slaveScript, true);
     }
 
     @Extension
