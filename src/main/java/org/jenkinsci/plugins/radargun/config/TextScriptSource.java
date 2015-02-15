@@ -40,8 +40,10 @@ public class TextScriptSource extends ScriptSource {
     @Override
     public void cleanup() throws InterruptedException, IOException {
         try {
-            masterScriptPath.delete();
-            slaveScriptPath.delete();
+            if(masterScriptPath != null)
+                masterScriptPath.delete();
+            if(slaveScriptPath != null)
+                slaveScriptPath.delete();
         } finally {
             masterScriptPath = null;
             slaveScriptPath = null;

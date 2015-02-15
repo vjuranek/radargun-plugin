@@ -59,7 +59,8 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
     }
     
     public void cleanup() throws InterruptedException, IOException {
-        tmpScenario.delete();
+        if(tmpScenario != null)
+            tmpScenario.delete();   
     }
 
     @Override
