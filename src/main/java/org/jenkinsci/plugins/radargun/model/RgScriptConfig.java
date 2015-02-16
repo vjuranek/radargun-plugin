@@ -1,12 +1,14 @@
 package org.jenkinsci.plugins.radargun.model;
 
+import java.io.Serializable;
+
 /**
  * Base for configuration description of RG exec scripts
  * 
  * @author vjuranek
  * 
  */
-public interface RgScriptConfig {
+public interface RgScriptConfig extends Serializable {
 
     /**
      * Provides path to interpreter of this script, e.g. <code>/bin/bash</code>, eventually with parameters like
