@@ -143,7 +143,7 @@ public class RadarGunBuilder extends Builder {
                 RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
                 build.addAction(slaveAction);
 
-                String[] slaveCmdLine = getSlaveCmdLine(build, launcher, slave, i, rgInstall);
+                String[] slaveCmdLine = getSlaveCmdLine(build, launcher, slave, i, nodes.getMaster(), rgInstall);
                 ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
                 nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
             }
@@ -160,8 +160,10 @@ public class RadarGunBuilder extends Builder {
     private String[] getMasterCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes,
             RadarGunInstallation rgInstall) throws InterruptedException, IOException {
         MasterScriptConfig masterConfig = new MasterShellScript();
-        masterConfig.withNumberOfSlaves(nodes.getSlaveCount()).withConfigPath(scenarioSource.getTmpScenarioPath(build))
-                .withScriptPath(rgInstall.getExecutable(masterConfig, launcher.getChannel()));
+        masterConfig.withNumberOfSlaves(nodes.getSlaveCount())
+                    .withConfigPath(scenarioSource.getTmpScenarioPath(build))
+                    .withMasterHost(nodes.getMaster().getHostname())
+                    .withScriptPath(rgInstall.getExecutable(masterConfig, launcher.getChannel()));
 
         if (pluginPath != null && !pluginPath.isEmpty()) {
             masterConfig.withPlugin(pluginPath);
@@ -177,11 +179,12 @@ public class RadarGunBuilder extends Builder {
         return masterCmdLine;
     }
 
-    private String[] getSlaveCmdLine(AbstractBuild<?, ?> build, Launcher launcher, Node slave, int slaveIndex,
+    private String[] getSlaveCmdLine(AbstractBuild<?, ?> build, Launcher launcher, Node slave, int slaveIndex, Node master,
             RadarGunInstallation rgInstall) throws InterruptedException, IOException {
         SlaveScriptConfig slaveConfig = new SlaveShellScript();
-        slaveConfig.withSlaveIndex(slaveIndex).withScriptPath(
-                rgInstall.getExecutable(slaveConfig, launcher.getChannel()));
+        slaveConfig.withSlaveIndex(slaveIndex)
+                   .withMasterHost(master.getHostname())
+                   .withScriptPath(rgInstall.getExecutable(slaveConfig, launcher.getChannel()));
         if (pluginPath != null && !pluginPath.isEmpty()) {
             slaveConfig.withPlugin(pluginPath);
             if (pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
