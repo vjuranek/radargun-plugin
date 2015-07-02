@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.radargun.model.impl;
 
+import java.io.File;
+
 import org.jenkinsci.plugins.radargun.model.RgScriptConfig;
 
 /**
@@ -10,7 +12,8 @@ import org.jenkinsci.plugins.radargun.model.RgScriptConfig;
  */
 public abstract class RgShellScript implements RgScriptConfig {
     
-    public static final String SHELL_EXEC = "/bin/sh";
+    public static final char SEP = File.separatorChar;
+    public static final String SHELL_EXEC = String.format("%cbin%csh", SEP, SEP);
     
     protected String scriptPath;
     
@@ -36,7 +39,18 @@ public abstract class RgShellScript implements RgScriptConfig {
     @Override
     public String[] getScriptCmd() {
         //return (String[])ArrayUtils.add(getInterpreter(), getScriptPath());
-        return new String[] {SHELL_EXEC, getScriptPath()};
+        return new String[] {SHELL_EXEC, getScriptPath() + SEP + getScriptName()};
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for(String s : getScriptCmd()) {
+            sb.append(s);
+            sb.append(" ");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
     }
     
 }
