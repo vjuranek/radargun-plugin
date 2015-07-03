@@ -39,7 +39,7 @@ public abstract class RgShellScript implements RgScriptConfig {
     @Override
     public String[] getScriptCmd() {
         //return (String[])ArrayUtils.add(getInterpreter(), getScriptPath());
-        return new String[] {SHELL_EXEC, getScriptPath() + SEP + getScriptName()};
+        return new String[] {SHELL_EXEC, getScriptPath()};
     }
     
     @Override

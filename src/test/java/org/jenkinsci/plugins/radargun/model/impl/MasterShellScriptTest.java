@@ -14,7 +14,7 @@ public class MasterShellScriptTest {
             .withPlugin("testPlugin")
             .withTailFollow()
             .withWait()
-            .withScriptPath("/tmp");
+            .withScriptPath("/tmp/master.sh");
         
         assertArrayEquals(new String[] {"/bin/sh", "/tmp/master.sh", "-t", "-w", "--add-plugin", "testPlugin", "-s", "10"}, master.getScriptCmd());
     }
