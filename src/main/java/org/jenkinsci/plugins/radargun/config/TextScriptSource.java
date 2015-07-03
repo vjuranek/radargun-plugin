@@ -65,11 +65,15 @@ public class TextScriptSource extends ScriptSource {
     }
     
     private FilePath createMasterScriptFile(FilePath workspace) throws InterruptedException, IOException {
-        return workspace.createTextTempFile("radargun_master", ".sh", masterScript, true);
+        FilePath master =  workspace.createTextTempFile("radargun_master", ".sh", masterScript, true);
+        master.chmod(0777);
+        return master;
     }
     
     private FilePath createSlaveScriptPath(FilePath workspace) throws InterruptedException, IOException {
-        return workspace.createTextTempFile("radargun_slave", ".sh", slaveScript, true);
+        FilePath slave = workspace.createTextTempFile("radargun_slave", ".sh", slaveScript, true);
+        slave.chmod(0777);
+        return slave;
     }
 
     @Extension
