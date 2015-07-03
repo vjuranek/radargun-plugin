@@ -35,7 +35,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
         // And also to gather the log from master
         nodeScriptConfig.withTailFollow().withWait();
-        String[] remoteExecScriptCmd =  new String[] { nodeScriptPath, hostname, "cd", workspace+";"}; //TODO override by workspace from Jenkins config
+        String[] remoteExecScriptCmd =  new String[] { nodeScriptPath, hostname};
         String[] remoteScript = (String[])ArrayUtils.addAll(remoteExecScriptCmd, nodeScriptConfig.getScriptCmd());
         if(jvmOpts != null && !jvmOpts.isEmpty()) {
             remoteScript = (String[]) ArrayUtils.addAll(remoteScript, new String[] {"-J", jvmOpts});
