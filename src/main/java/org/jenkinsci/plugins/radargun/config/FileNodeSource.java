@@ -25,7 +25,7 @@ public class FileNodeSource extends NodeSource {
     }
     
     @Override
-    public NodeList getNodesList(Resolver resolver) throws IOException {
+    public NodeList getNodesList(Resolver resolver) throws IOException, InterruptedException {
         String nodeListPathRes = resolver.doResolve(nodeListPath);
         FilePath fp = new FilePath(new File(nodeListPathRes));
         String nodes = fp.readToString();

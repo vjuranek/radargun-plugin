@@ -13,7 +13,7 @@ import org.jenkinsci.plugins.radargun.util.Resolver;
 
 public abstract class NodeSource implements Describable<NodeSource> {
 
-    public abstract NodeList getNodesList(Resolver resolver) throws IOException;
+    public abstract NodeList getNodesList(Resolver resolver) throws IOException, InterruptedException;
 
     @Override
     @SuppressWarnings("unchecked")

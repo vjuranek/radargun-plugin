@@ -23,6 +23,7 @@ import java.util.List;
 import jenkins.model.Jenkins;
 
 import org.jenkinsci.plugins.radargun.model.RgScriptConfig;
+import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -66,6 +67,11 @@ public class RadarGunInstallation extends ToolInstallation implements Environmen
                         String.format(
                                 "Cannot resolver path to executable %s, something wrong with your RG installation? Exiting ... ",
                                 executable.getScriptName()));
+            }
+
+            @Override
+            public void checkRoles(RoleChecker arg0) throws SecurityException {
+                //no-op
             }
         });
     }
