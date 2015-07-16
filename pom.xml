@@ -19,6 +19,18 @@
         </license>
     </licenses>
 
+    <properties>
+        <version.snakeyaml>1.15</version.snakeyaml>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${version.snakeyaml}</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
