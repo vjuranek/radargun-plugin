@@ -1,10 +1,15 @@
 ---
+defaults: &defaults
+    infinispan_server1_address: 172.12.0.1
+nodes:
 - 
   edg-perf08:
     envVars: 
       jgroups.udp.mcast_addr: 172.12.0.8
     jvmOpts: "-server -Xms8g -Xmx8g -XX:+UseLargePages"
+    <<: *defaults
 - 
   edg-perf01:
     envVars: 
       jgroups.udp.mcast_addr: 172.12.0.1
+    <<: *defaults
