@@ -45,11 +45,6 @@ public class Node {
         this.envVars = envVars;
     }
 
-    /**
-     * 
-     * Parse node parameters. First part is node hostname, the rest of the line, separated from hostname by space, are
-     * JVM options
-     */
     public static Node parseNode(String hostname, Map<String, Object> nodeConfig) {
         String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String)nodeConfig.get(JVM_OPTS_KEY) : null;
         @SuppressWarnings("unchecked")

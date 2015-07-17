@@ -8,6 +8,18 @@ import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.yaml.snakeyaml.Yaml;
 
+/**
+ * {@link NodeConfigParser} for YAML configurations. 
+ * YAML file can contain arbitrary section, the only required is {@code nodes} list,
+ * containing list of nodes, each represented by it's hostname followed by a map of options.
+ * This oprions can contain elements {@code jvmOtions} and {@code envVars}.
+ * {@code jvmOtions} is plan string containing JVM options,
+ * {@code envVars} is a map of environment variables and their values, which should be
+ * exported to given host.
+ * 
+ * @author vjuranek
+ *
+ */
 public class YamlNodeConfigParser implements NodeConfigParser {
 
     public static final String NODES_KEY = "nodes";
