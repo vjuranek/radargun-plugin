@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 import net.sf.json.JSONObject;
 
-import org.jenkinsci.plugins.radargun.config.NodeSource;
+import org.jenkinsci.plugins.radargun.config.NodeConfigSource;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
 import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
@@ -51,7 +51,7 @@ public class RadarGunBuilder extends Builder {
 
     private final String radarGunName;
     private final ScenarioSource scenarioSource;
-    private final NodeSource nodeSource;
+    private final NodeConfigSource nodeSource;
     private final ScriptSource scriptSource;
     private final String log4jConfig;
     private final String defaultJvmArgs;
@@ -61,7 +61,7 @@ public class RadarGunBuilder extends Builder {
     private final String reporterPath;
 
     @DataBoundConstructor
-    public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeSource nodeSource,
+    public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeConfigSource nodeSource,
             ScriptSource scriptSource, String log4jConfig, String defaultJvmArgs, String workspacePath,
             String pluginPath, String pluginConfigPath, String reporterPath) {
         this.radarGunName = radarGunName;
@@ -84,7 +84,7 @@ public class RadarGunBuilder extends Builder {
         return scenarioSource;
     }
 
-    public NodeSource getNodeSource() {
+    public NodeConfigSource getNodeSource() {
         return nodeSource;
     }
 
@@ -316,8 +316,8 @@ public class RadarGunBuilder extends Builder {
             return ScenarioSource.all();
         }
 
-        public static DescriptorExtensionList<NodeSource, Descriptor<NodeSource>> getNodeSources() {
-            return NodeSource.all();
+        public static DescriptorExtensionList<NodeConfigSource, Descriptor<NodeConfigSource>> getNodeSources() {
+            return NodeConfigSource.all();
         }
 
         public static DescriptorExtensionList<ScriptSource, Descriptor<ScriptSource>> getScriptSources() {

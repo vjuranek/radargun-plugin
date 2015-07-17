@@ -7,12 +7,12 @@ import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class TextNodeSource extends NodeSource {
+public class TextNodeConfigSource extends NodeConfigSource {
 
     private final String nodes;
     
     @DataBoundConstructor
-    public TextNodeSource(String nodes) {
+    public TextNodeConfigSource(String nodes) {
         this.nodes = nodes;
     }
 

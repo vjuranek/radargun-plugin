@@ -11,12 +11,12 @@ import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-public class FileNodeSource extends NodeSource {
+public class FileNodeConfigSource extends NodeConfigSource {
 
     private final String nodeListPath;
     
     @DataBoundConstructor
-    public FileNodeSource(String nodeListPath) {
+    public FileNodeConfigSource(String nodeListPath) {
         this.nodeListPath = nodeListPath;
     }
 

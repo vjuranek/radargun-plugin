@@ -11,21 +11,21 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 
-public abstract class NodeSource implements Describable<NodeSource> {
+public abstract class NodeConfigSource implements Describable<NodeConfigSource> {
 
     public abstract NodeList getNodesList(Resolver resolver) throws IOException, InterruptedException;
 
     @Override
     @SuppressWarnings("unchecked")
-    public Descriptor<NodeSource> getDescriptor() {
+    public Descriptor<NodeConfigSource> getDescriptor() {
         return Jenkins.getInstance().getDescriptorOrDie(getClass());
     }
 
-    public static final DescriptorExtensionList<NodeSource, Descriptor<NodeSource>> all() {
-        return Jenkins.getInstance().getDescriptorList(NodeSource.class);
+    public static final DescriptorExtensionList<NodeConfigSource, Descriptor<NodeConfigSource>> all() {
+        return Jenkins.getInstance().getDescriptorList(NodeConfigSource.class);
     }
 
-    public static abstract class NodeSourceDescriptor extends Descriptor<NodeSource> {
+    public static abstract class NodeSourceDescriptor extends Descriptor<NodeConfigSource> {
     }
 
 }
