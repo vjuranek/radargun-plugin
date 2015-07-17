@@ -5,12 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
+import org.jenkinsci.plugins.radargun.util.IOUtils;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.junit.Test;
 
@@ -18,11 +17,7 @@ public class YamlNodeConfigParserTest {
 
     @Test
     public void testNodeConfigParser() throws IOException {
-        String config = null;
-        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("testNodeConfig.yaml")) {
-            Scanner s = new Scanner(is).useDelimiter("\\A");
-            config = s.hasNext() ? s.next() : null;
-        }
+        String config = IOUtils.loadResourceAsString("testNodeConfig.yaml");
         
         assertNotNull("Unable to load test YAML config file", config);
         NodeList nodes = ParseUtils.parseNodeList(config);
