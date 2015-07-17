@@ -29,10 +29,15 @@ public class YamlNodeConfigParserTest {
         Map<String, String> envVars = master.getEnvVars();
         assertNotNull(envVars);
         assertEquals("172.12.0.8", envVars.get("jgroups.udp.mcast_addr"));
+        assertEquals("172.12.0.1", envVars.get("infinispan_server1_address"));
         
         assertEquals(1, nodes.getSlaveCount());
         Node slave = nodes.getNodes().get(1);
         assertEquals("edg-perf01", slave.getHostname());
         assertNull(slave.getJvmOptions());
+        envVars = slave.getEnvVars();
+        assertNotNull(envVars);
+        assertEquals("172.12.0.1", envVars.get("jgroups.udp.mcast_addr"));
+        assertEquals("172.12.0.1", envVars.get("infinispan_server1_address"));
     }
 }
