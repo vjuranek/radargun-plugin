@@ -23,6 +23,8 @@ import org.yaml.snakeyaml.Yaml;
 public class YamlNodeConfigParser implements NodeConfigParser {
 
     public static final String NODES_KEY = "nodes";
+    public static final String JVM_OPTS_KEY = "jvmOpts";
+    public static final String ENV_VARS_KEY = "envVars";
     
     private final Yaml yaml;
 
@@ -43,17 +45,24 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         Map<String, Object> masterConf = nodesConf.remove(0);
         String masterHost = masterConf.keySet().iterator().next();
         @SuppressWarnings("unchecked")
-        Node master = Node.parseNode(masterHost, (Map<String, Object>)masterConf.get(masterHost));
+        Node master = parseNode(masterHost, (Map<String, Object>)masterConf.get(masterHost));
 
         List<Node> nodes = new LinkedList<Node>();
         for (Map<String, Object> nodeConf : nodesConf) {
             String nodeHost = nodeConf.keySet().iterator().next();
             @SuppressWarnings("unchecked")
-            Node node = Node.parseNode(nodeHost, (Map<String, Object>)nodeConf.get(nodeHost));
+            Node node = parseNode(nodeHost, (Map<String, Object>)nodeConf.get(nodeHost));
             nodes.add(node);
         }
 
         return new NodeList(master, nodes);
     }
 
+    public Node parseNode(String hostname, Map<String, Object> nodeConfig) {
+        String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String)nodeConfig.get(JVM_OPTS_KEY) : null;
+        @SuppressWarnings("unchecked")
+        Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>)nodeConfig.get(ENV_VARS_KEY) : null;
+        return new Node(hostname, jvmOpts, envVars);
+    }
+    
 }

@@ -3,9 +3,6 @@ package org.jenkinsci.plugins.radargun.model.impl;
 import java.util.Map;
 
 public class Node {
-
-    public static final String JVM_OPTS_KEY = "jvmOpts";
-    public static final String ENV_VARS_KEY = "envVars";
     
     private String hostname;
     private String jvmOptions;
@@ -43,13 +40,6 @@ public class Node {
 
     public void setEnvVars(Map<String, String> envVars) {
         this.envVars = envVars;
-    }
-
-    public static Node parseNode(String hostname, Map<String, Object> nodeConfig) {
-        String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String)nodeConfig.get(JVM_OPTS_KEY) : null;
-        @SuppressWarnings("unchecked")
-        Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>)nodeConfig.get(ENV_VARS_KEY) : null;
-        return new Node(hostname, jvmOpts, envVars);
     }
 
 }
