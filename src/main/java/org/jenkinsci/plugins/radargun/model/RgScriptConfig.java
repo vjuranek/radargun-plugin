@@ -3,7 +3,8 @@ package org.jenkinsci.plugins.radargun.model;
 import java.io.Serializable;
 
 /**
- * Base for configuration description of RG exec scripts
+ * Base for configuration description of RG exec scripts, i.e. scripts delivered by RG installation, 
+ * not scripts provided by this plugin or user.
  * 
  * @author vjuranek
  * 

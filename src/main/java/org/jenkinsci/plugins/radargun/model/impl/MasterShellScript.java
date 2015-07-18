@@ -6,7 +6,12 @@ import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
 
-
+/**
+ * Represent RG master shell script, i.e. $RG_HOME/bin/msater.sh
+ * 
+ * @author vjuranek
+ *
+ */
 public class MasterShellScript extends NodeShellScript implements MasterScriptConfig {
 
     public static final String MASTER_SCRIPT_NAME = "master.sh";

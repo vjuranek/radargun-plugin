@@ -1,5 +1,11 @@
 package org.jenkinsci.plugins.radargun.model;
 
+/**
+ * Represent RG master script, currently only shell script is provided by RG
+ * 
+ * @author vjuranek
+ *
+ */
 public interface MasterScriptConfig extends NodeScriptConfig {
 
     public String getConfigPath();

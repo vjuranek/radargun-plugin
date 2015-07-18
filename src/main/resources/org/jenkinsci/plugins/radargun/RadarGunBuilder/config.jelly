@@ -44,9 +44,9 @@
             <f:textbox />
         </f:entry>
         
-        <f:entry title="Default JVM arguments" field="defaultJvmArgs" description="Defualt JVM args to be passed to master and slave nodes">
+        <!-- <f:entry title="Default JVM arguments" field="defaultJvmArgs" description="Defualt JVM args to be passed to master and slave nodes">
             <f:textbox />
-        </f:entry>
+        </f:entry> -->
 
         <f:entry title="Workspace path" field="workspacePath" description="Path to working directory on master and slaves">
             <f:textbox />

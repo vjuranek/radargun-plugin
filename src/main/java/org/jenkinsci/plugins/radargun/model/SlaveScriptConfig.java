@@ -1,5 +1,11 @@
 package org.jenkinsci.plugins.radargun.model;
 
+/**
+ * Represent RG slave script, currently only shell script is provided by RG
+ * 
+ * @author vjuranek
+ *
+ */
 public interface SlaveScriptConfig extends NodeScriptConfig {
     
     public int getSlaveIndex();

@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
 import org.jenkinsci.plugins.radargun.model.SlaveScriptConfig;
 
+/**
+ * Represents RG slave script, i.e. $RG_HOME/bin/slave.sh
+ * 
+ * @author vjuranek
+ *
+ */
 public class SlaveShellScript extends NodeShellScript implements SlaveScriptConfig {
 
     public static final String SLAVE_SCRIPT_NAME = "slave.sh";
