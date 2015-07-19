@@ -26,8 +26,11 @@ import org.jenkinsci.plugins.radargun.util.Functions;
  */
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
+    public static final String ENV_CMD = "env ";
+    public static final String EXPORT_CMD = "export ";
     public static final char ENV_KEY_VAL_SEPARATOR = '=';
-    public static final char ENV_VAR_SEPARATOR = ';';
+    public static final char ENV_VAR_SEPARATOR = ' ';
+    public static final char ENV_VAR_QUOTE = '"';
 
     public abstract String getMasterScriptPath(FilePath workspace) throws InterruptedException, IOException;
 
@@ -44,7 +47,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         nodeScriptConfig.withTailFollow().withWait();
         String envVars = node.getEnvVars() == null ? null : prepareEnvVars(node.getEnvVars());
         String[] remoteExecScriptCmd = envVars == null ? new String[] { nodeScriptPath, node.getHostname() }
-                : new String[] { envVars, nodeScriptPath, node.getHostname() };
+                : new String[] {nodeScriptPath, node.getHostname(), ENV_CMD, envVars };
         String[] remoteScript = (String[]) ArrayUtils.addAll(remoteExecScriptCmd, nodeScriptConfig.getScriptCmd());
         if (jvmOpts != null && !jvmOpts.isEmpty()) {
             remoteScript = (String[]) ArrayUtils.addAll(remoteScript, new String[] { "-J", jvmOpts });
@@ -76,7 +79,8 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         Iterator<String> envIter = envVars.keySet().iterator();
         while (envIter.hasNext()) {
             String key = envIter.next();
-            sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(envVars.get(key)).append(ENV_VAR_SEPARATOR);
+            sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE)
+                    .append(envVars.get(key)).append(ENV_VAR_QUOTE).append(ENV_VAR_SEPARATOR);
         }
         return sb.toString();
     }
