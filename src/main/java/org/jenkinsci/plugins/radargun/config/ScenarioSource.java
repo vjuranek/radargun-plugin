@@ -26,13 +26,12 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
     private transient String tmpScenarioPath;
     private transient FilePath tmpScenario;
 
-    protected abstract FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException;
+    protected abstract FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException,
+            IOException;
 
     public String getTmpScenarioPath(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
-        if (tmpScenarioPath == null) {
-            tmpScenario = createTmpScenrioFile(build);
-            tmpScenarioPath = tmpScenario.getRemote();
-        }
+        tmpScenario = createTmpScenrioFile(build);
+        tmpScenarioPath = tmpScenario.getRemote();
         return tmpScenarioPath;
     }
 
@@ -41,7 +40,7 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
      */
     public FilePath tmpScenarioFromContent(String scenarioContent, AbstractBuild<?, ?> build)
             throws InterruptedException, IOException {
-        //String scenario = Resolver.buildVar(build, scenarioContent);
+        // String scenario = Resolver.buildVar(build, scenarioContent);
         // TODO env. var expansion? Expand on node where it will be launched
         FilePath path = build.getWorkspace().createTextTempFile(DEFAULT_SCENARIO_NAME, DEFAULT_SCENARIO_SUFFIX,
                 scenarioContent, true);
@@ -57,10 +56,12 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
         // TODO env. var expansion? Expand on node where it will be launched
         return tmpScenarioFromContent(scenarioContent, build);
     }
-    
+
     public void cleanup() throws InterruptedException, IOException {
-        if(tmpScenario != null)
-            tmpScenario.delete();   
+        if (tmpScenario != null) {
+            tmpScenario.delete();
+            tmpScenario = null;
+        }
     }
 
     @Override
