@@ -13,7 +13,8 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 
 /**
- * ScenarioSource
+ * Base class for RG scenarios providers. Takes care about loading scenarios, expanding Jenkins variables and
+ * createing/deleteing temporal scenario file with resolved variables.
  * 
  * @author vjuranek
  * 

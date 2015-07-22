@@ -9,23 +9,27 @@ import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * {@link NodeConfigParser} for YAML configurations. 
- * YAML file can contain arbitrary section, the only required is {@code nodes} list,
- * containing list of nodes, each represented by it's hostname followed by a map of options.
- * This oprions can contain elements {@code jvmOtions} and {@code envVars}.
- * {@code jvmOtions} is plan string containing JVM options,
- * {@code envVars} is a map of environment variables and their values, which should be
- * exported to given host.
+ * {@link NodeConfigParser} for YAML configurations. YAML file can contain arbitrary section, the only required is
+ * {@code nodes} list, containing list of nodes, each represented by it's hostname followed by a map of options. This
+ * oprions can contain following elements:
+ * <ul>
+ * <li>{@code jvmOtions} and {@code envVars}. {@code jvmOtions} is a plain string containing JVM options like -Xmx etc.</li>
+ * <li>{@code javaProps} is a map of java propertied to be passed to RG startup script. Typically should be used for
+ * setting up variables used in RG scenarios. Properties are entered without "-D" prefix, this will be added later on
+ * automatically.</li>
+ * <li>{@code envVars} is a map of environment variables and their values, which should be exported to given host.</li>
+ * </ul>
  * 
  * @author vjuranek
- *
+ * 
  */
 public class YamlNodeConfigParser implements NodeConfigParser {
 
     public static final String NODES_KEY = "nodes";
     public static final String JVM_OPTS_KEY = "jvmOpts";
+    public static final String JAVA_PROPS_KEY = "javaProps";
     public static final String ENV_VARS_KEY = "envVars";
-    
+
     private final Yaml yaml;
 
     public YamlNodeConfigParser() {
@@ -45,13 +49,13 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         Map<String, Object> masterConf = nodesConf.remove(0);
         String masterHost = masterConf.keySet().iterator().next();
         @SuppressWarnings("unchecked")
-        Node master = parseNode(masterHost, (Map<String, Object>)masterConf.get(masterHost));
+        Node master = parseNode(masterHost, (Map<String, Object>) masterConf.get(masterHost));
 
         List<Node> nodes = new LinkedList<Node>();
         for (Map<String, Object> nodeConf : nodesConf) {
             String nodeHost = nodeConf.keySet().iterator().next();
             @SuppressWarnings("unchecked")
-            Node node = parseNode(nodeHost, (Map<String, Object>)nodeConf.get(nodeHost));
+            Node node = parseNode(nodeHost, (Map<String, Object>) nodeConf.get(nodeHost));
             nodes.add(node);
         }
 
@@ -59,10 +63,14 @@ public class YamlNodeConfigParser implements NodeConfigParser {
     }
 
     public Node parseNode(String hostname, Map<String, Object> nodeConfig) {
-        String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String)nodeConfig.get(JVM_OPTS_KEY) : null;
+        String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String) nodeConfig.get(JVM_OPTS_KEY) : null;
         @SuppressWarnings("unchecked")
-        Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>)nodeConfig.get(ENV_VARS_KEY) : null;
-        return new Node(hostname, jvmOpts, envVars);
+        Map<String, String> javaProps = nodeConfig.containsKey(JAVA_PROPS_KEY) ? (Map<String, String>) nodeConfig
+                .get(JAVA_PROPS_KEY) : null;
+        @SuppressWarnings("unchecked")
+        Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>) nodeConfig
+                .get(ENV_VARS_KEY) : null;
+        return new Node(hostname, jvmOpts, javaProps, envVars);
     }
-    
+
 }

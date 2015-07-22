@@ -39,7 +39,6 @@ public class Option {
                 if (hasOptionValue()) {
                     options.add(getOptionSwitch());
                     options.add(val.toString());
-
                 } else { // no value for this switch, getter should be boolean
                     if (((Boolean) val).booleanValue())
                         options.add(getOptionSwitch());

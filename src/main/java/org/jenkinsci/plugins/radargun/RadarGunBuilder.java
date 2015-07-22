@@ -53,8 +53,6 @@ public class RadarGunBuilder extends Builder {
     private final ScenarioSource scenarioSource;
     private final NodeConfigSource nodeSource;
     private final ScriptSource scriptSource;
-    private final String log4jConfig; //TODO keep separate log4j option?
-    //private final String defaultJvmArgs;
     private final String workspacePath;
     private final String pluginPath;
     private final String pluginConfigPath;
@@ -62,14 +60,12 @@ public class RadarGunBuilder extends Builder {
 
     @DataBoundConstructor
     public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeConfigSource nodeSource,
-            ScriptSource scriptSource, String log4jConfig, String workspacePath,
-            String pluginPath, String pluginConfigPath, String reporterPath) {
+            ScriptSource scriptSource, String workspacePath, String pluginPath, String pluginConfigPath,
+            String reporterPath) {
         this.radarGunName = radarGunName;
         this.scenarioSource = scenarioSource;
         this.nodeSource = nodeSource;
         this.scriptSource = scriptSource;
-        this.log4jConfig = Util.fixEmpty(log4jConfig);
-        //this.defaultJvmArgs = defaultJvmArgs;
         this.workspacePath = Util.fixEmpty(workspacePath);
         this.pluginPath = pluginPath;
         this.pluginConfigPath = pluginConfigPath;
@@ -91,14 +87,6 @@ public class RadarGunBuilder extends Builder {
     public ScriptSource getScriptSource() {
         return scriptSource;
     }
-
-    public String getLog4jConfig() {
-        return log4jConfig;
-    }
-
-    /*public String getDefaultJvmArgs() {
-        return defaultJvmArgs;
-    }*/
 
     public String getWorkspacePath() {
         return workspacePath;
@@ -159,11 +147,11 @@ public class RadarGunBuilder extends Builder {
 
     private String[] getMasterCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes,
             RadarGunInstallation rgInstall) throws InterruptedException, IOException {
+        Node master = nodes.getMaster();
         MasterScriptConfig masterScriptConfig = new MasterShellScript();
         masterScriptConfig.withNumberOfSlaves(nodes.getSlaveCount())
-                    .withConfigPath(scenarioSource.getTmpScenarioPath(build))
-                    .withMasterHost(nodes.getMaster().getHostname())
-                    .withScriptPath(rgInstall.getExecutable(masterScriptConfig, launcher.getChannel()));
+                .withConfigPath(scenarioSource.getTmpScenarioPath(build)).withMasterHost(master.getHostname())
+                .withScriptPath(rgInstall.getExecutable(masterScriptConfig, launcher.getChannel()));
 
         if (pluginPath != null && !pluginPath.isEmpty()) {
             masterScriptConfig.withPlugin(pluginPath);
@@ -174,17 +162,19 @@ public class RadarGunBuilder extends Builder {
         if (reporterPath != null && !reporterPath.isEmpty())
             masterScriptConfig.withReporter(reporterPath);
 
-        String[] masterCmdLine = scriptSource.getMasterCmdLine(build.getWorkspace(), nodes.getMaster(),
-                masterScriptConfig, buildJvmOptions(build, nodes.getMaster()));
+        String javaOpts = Resolver.buildVar(build, master.getAllJavaOpts());
+        masterScriptConfig.withJavaOpts(javaOpts);
+        
+        String[] masterCmdLine = scriptSource.getMasterCmdLine(build.getWorkspace(), master, masterScriptConfig);
         return masterCmdLine;
     }
 
     private String[] getSlaveCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes, int slaveIndex,
             RadarGunInstallation rgInstall) throws InterruptedException, IOException {
         SlaveScriptConfig slaveScriptConfig = new SlaveShellScript();
-        slaveScriptConfig.withSlaveIndex(slaveIndex)
-                   .withMasterHost(nodes.getMaster().getHostname())
-                   .withScriptPath(rgInstall.getExecutable(slaveScriptConfig, launcher.getChannel()));
+        slaveScriptConfig.withSlaveIndex(slaveIndex).withMasterHost(nodes.getMaster().getHostname())
+                .withScriptPath(rgInstall.getExecutable(slaveScriptConfig, launcher.getChannel()));
+        
         if (pluginPath != null && !pluginPath.isEmpty()) {
             slaveScriptConfig.withPlugin(pluginPath);
             if (pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
@@ -193,8 +183,10 @@ public class RadarGunBuilder extends Builder {
         }
 
         Node slave = nodes.getSlaves().get(slaveIndex);
-        String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave, slaveScriptConfig,
-                buildJvmOptions(build, slave));
+        String javaOpts = Resolver.buildVar(build, slave.getAllJavaOpts());
+        slaveScriptConfig.withJavaOpts(javaOpts);
+        
+        String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave, slaveScriptConfig);
         return slaveCmdLine;
 
     }
@@ -230,15 +222,6 @@ public class RadarGunBuilder extends Builder {
         }
 
         return isSuccess;
-    }
-
-    private String buildJvmOptions(AbstractBuild<?, ?> build, Node node) {
-        String nodeJvmOpts = Resolver.buildVar(build, node.getJvmOptions());
-        String log4jConf = Resolver.buildVar(build, log4jConfig);
-        String log4jConfOpt = log4jConf == null ? "" : String.format("%s%s", "-Dlog4j.configuration=", log4jConf);
-        String defaultOptsRes = log4jConfOpt; //TODO keep separate log4j option?
-        String jvmOpts = nodeJvmOpts == null ? defaultOptsRes : String.format("%s %s", defaultOptsRes, nodeJvmOpts);
-        return jvmOpts.trim();
     }
 
     private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)

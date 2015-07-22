@@ -3,8 +3,8 @@ package org.jenkinsci.plugins.radargun.model;
 import java.io.Serializable;
 
 /**
- * Base for configuration description of RG exec scripts, i.e. scripts delivered by RG installation, 
- * not scripts provided by this plugin or user.
+ * Base for representing RG exec scripts, i.e. scripts delivered by RG installation, not scripts provided by this plugin
+ * or user. Currently these are especially shell scripts {@code master.sh} and {@code slave.sh}.
  * 
  * @author vjuranek
  * 
@@ -19,7 +19,7 @@ public interface RgScriptConfig extends Serializable {
      * @return Full path to the script interpreter
      */
     public String[] getInterpreter();
-    
+
     /**
      * Name of the script, without full path.
      * 

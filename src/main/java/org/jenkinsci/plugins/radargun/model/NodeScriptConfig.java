@@ -21,7 +21,7 @@ public interface NodeScriptConfig extends RgScriptConfig {
 
     public String getPluginConfig();
     
-    //public String  getJavaOpts();
+    public String  getJavaOpts();
 
     public NodeScriptConfig withMasterHost(String masterHostname);
 
@@ -35,7 +35,7 @@ public interface NodeScriptConfig extends RgScriptConfig {
 
     public NodeScriptConfig withPluginConfig(String pluginConfig);
     
-    //public NodeScriptConfig withJavaOpts(String javaOpts);
+    public NodeScriptConfig withJavaOpts(String javaOpts);
 
     public static enum Options {
         MASTER_HOST(new Option("-m", "getMasterHost", true)), 
@@ -43,8 +43,8 @@ public interface NodeScriptConfig extends RgScriptConfig {
         TAIL_FOLLOW(new Option("-t", "isTailFollow", false)), 
         WAIT(new Option("-w", "isWait", false)), 
         PLUGIN(new Option("--add-plugin", "getPlugin", true)), 
-        PLUGIN_CONFIG(new Option("--add-config", "getPluginConfig", true));
-        //JAVA_OPTS(new Option("-J", "getJavaOpts", true));
+        PLUGIN_CONFIG(new Option("--add-config", "getPluginConfig", true)),
+        JAVA_OPTS(new Option("-J", "getJavaOpts", true));
 
         private Option option;
 

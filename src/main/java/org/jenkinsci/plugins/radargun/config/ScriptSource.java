@@ -26,11 +26,12 @@ import org.jenkinsci.plugins.radargun.util.Functions;
  */
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
+    public static final String JAVA_PROP_PREFIX = "-D";
     public static final String ENV_CMD = "env ";
     public static final String EXPORT_CMD = "export ";
     public static final char ENV_KEY_VAL_SEPARATOR = '=';
-    public static final char ENV_VAR_SEPARATOR = ' ';
     public static final char ENV_VAR_QUOTE = '"';
+    public static final char VAR_SEPARATOR = ' ';
 
     public abstract String getMasterScriptPath(FilePath workspace) throws InterruptedException, IOException;
 
@@ -38,8 +39,8 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
 
     public abstract void cleanup() throws InterruptedException, IOException;
 
-    public String[] getNodeCmdLine(String nodeScriptPath, Node node, NodeScriptConfig nodeScriptConfig, String jvmOpts,
-            String workspace) throws InterruptedException, IOException {
+    public String[] getNodeCmdLine(String nodeScriptPath, Node node, NodeScriptConfig nodeScriptConfig, String workspace)
+            throws InterruptedException, IOException {
         Functions.makeExecutable(nodeScriptPath);
         // Run with "tail" option ("-t") not to finish immediately once the RG process is started.
         // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
@@ -47,24 +48,21 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         nodeScriptConfig.withTailFollow().withWait();
         String envVars = node.getEnvVars() == null ? null : prepareEnvVars(node.getEnvVars());
         String[] remoteExecScriptCmd = envVars == null ? new String[] { nodeScriptPath, node.getHostname() }
-                : new String[] {nodeScriptPath, node.getHostname(), ENV_CMD, envVars };
+                : new String[] { nodeScriptPath, node.getHostname(), ENV_CMD, envVars };
         String[] remoteScript = (String[]) ArrayUtils.addAll(remoteExecScriptCmd, nodeScriptConfig.getScriptCmd());
-        if (jvmOpts != null && !jvmOpts.isEmpty()) {
-            remoteScript = (String[]) ArrayUtils.addAll(remoteScript, new String[] { "-J", jvmOpts });
-        }
         return remoteScript;
     }
 
-    public String[] getMasterCmdLine(FilePath workspace, Node node, MasterScriptConfig nodeScriptConfig, String jvmOpts)
+    public String[] getMasterCmdLine(FilePath workspace, Node node, MasterScriptConfig nodeScriptConfig)
             throws InterruptedException, IOException {
         String masterScriptPath = getMasterScriptPath(workspace);
-        return getNodeCmdLine(masterScriptPath, node, nodeScriptConfig, jvmOpts, workspace.getRemote());
+        return getNodeCmdLine(masterScriptPath, node, nodeScriptConfig, workspace.getRemote());
     }
 
-    public String[] getSlaveCmdLine(FilePath workspace, Node node, SlaveScriptConfig nodeScriptConfig, String jvmOpts)
+    public String[] getSlaveCmdLine(FilePath workspace, Node node, SlaveScriptConfig nodeScriptConfig)
             throws InterruptedException, IOException {
         String slaveScriptPath = getSlaveScriptPath(workspace);
-        return getNodeCmdLine(slaveScriptPath, node, nodeScriptConfig, jvmOpts, workspace.getRemote());
+        return getNodeCmdLine(slaveScriptPath, node, nodeScriptConfig, workspace.getRemote());
     }
 
     /**
@@ -79,8 +77,8 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         Iterator<String> envIter = envVars.keySet().iterator();
         while (envIter.hasNext()) {
             String key = envIter.next();
-            sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE)
-                    .append(envVars.get(key)).append(ENV_VAR_QUOTE).append(ENV_VAR_SEPARATOR);
+            sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE).append(envVars.get(key))
+                    .append(ENV_VAR_QUOTE).append(VAR_SEPARATOR);
         }
         return sb.toString();
     }

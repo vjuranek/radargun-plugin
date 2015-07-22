@@ -40,14 +40,6 @@
     </f:dropdownList>
 
     <f:advanced>
-        <f:entry title="Log4j config file" field="log4jConfig" description="Path to a file with Log4j configuration">
-            <f:textbox />
-        </f:entry>
-        
-        <!-- <f:entry title="Default JVM arguments" field="defaultJvmArgs" description="Defualt JVM args to be passed to master and slave nodes">
-            <f:textbox />
-        </f:entry> -->
-
         <f:entry title="Workspace path" field="workspacePath" description="Path to working directory on master and slaves">
             <f:textbox />
         </f:entry>
