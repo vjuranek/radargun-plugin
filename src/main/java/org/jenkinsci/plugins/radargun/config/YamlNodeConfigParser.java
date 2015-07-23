@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.yaml.snakeyaml.Yaml;
@@ -26,6 +27,7 @@ import org.yaml.snakeyaml.Yaml;
 public class YamlNodeConfigParser implements NodeConfigParser {
 
     public static final String NODES_KEY = "nodes";
+    public static final String MASTER_FQDN = "fqdn";
     public static final String JVM_OPTS_KEY = "jvmOpts";
     public static final String JAVA_PROPS_KEY = "javaProps";
     public static final String ENV_VARS_KEY = "envVars";
@@ -49,7 +51,7 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         Map<String, Object> masterConf = nodesConf.remove(0);
         String masterHost = masterConf.keySet().iterator().next();
         @SuppressWarnings("unchecked")
-        Node master = parseNode(masterHost, (Map<String, Object>) masterConf.get(masterHost));
+        MasterNode master = parseMasterNode(masterHost, (Map<String, Object>) masterConf.get(masterHost));
 
         List<Node> nodes = new LinkedList<Node>();
         for (Map<String, Object> nodeConf : nodesConf) {
@@ -62,7 +64,7 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         return new NodeList(master, nodes);
     }
 
-    public Node parseNode(String hostname, Map<String, Object> nodeConfig) {
+    private Node parseNode(String hostname, Map<String, Object> nodeConfig) {
         String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String) nodeConfig.get(JVM_OPTS_KEY) : null;
         @SuppressWarnings("unchecked")
         Map<String, String> javaProps = nodeConfig.containsKey(JAVA_PROPS_KEY) ? (Map<String, String>) nodeConfig
@@ -71,6 +73,12 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>) nodeConfig
                 .get(ENV_VARS_KEY) : null;
         return new Node(hostname, jvmOpts, javaProps, envVars);
+    }
+    
+    private MasterNode parseMasterNode(String hostname, Map<String, Object> nodeConfig) {
+        Node node = parseNode(hostname, nodeConfig);
+        String fqdn = nodeConfig.containsKey(MASTER_FQDN) ? (String) nodeConfig.get(MASTER_FQDN) : hostname;
+        return new MasterNode(node, fqdn);
     }
 
 }

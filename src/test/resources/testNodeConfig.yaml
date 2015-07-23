@@ -4,6 +4,7 @@ defaults: &defaults
 nodes:
 - 
   edg-perf08:
+    fqdn: 172.12.0.8
     envVars: 
       jgroups.udp.mcast_addr: 172.12.0.8
       <<: *defaults

@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import java.io.IOException;
 import java.util.Map;
 
+import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.IOUtils;
@@ -23,7 +24,8 @@ public class YamlNodeConfigParserTest {
         NodeList nodes = ParseUtils.parseNodeList(config);
         assertEquals(2, nodes.getNodes().size());
         
-        Node master = nodes.getMaster();
+        MasterNode master = (MasterNode) nodes.getMaster();
+        assertEquals("172.12.0.8", master.getFqdn());
         assertEquals("edg-perf08", master.getHostname());
         assertEquals("-server -Xms8g -Xmx8g -XX:+UseLargePages", master.getJvmOptions());
         Map<String, String> envVars = master.getEnvVars();

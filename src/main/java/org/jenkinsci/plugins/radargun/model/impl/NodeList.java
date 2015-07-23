@@ -27,8 +27,8 @@ public class NodeList {
         return nodes;
     }
 
-    public Node getMaster() {
-        return nodes.get(0);
+    public MasterNode getMaster() {
+        return (MasterNode)nodes.get(0);
     }
     
     public List<Node> getSlaves() {

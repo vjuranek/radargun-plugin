@@ -37,6 +37,7 @@ import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
 import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
 import org.jenkinsci.plugins.radargun.model.SlaveScriptConfig;
+import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.MasterShellScript;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
@@ -147,10 +148,10 @@ public class RadarGunBuilder extends Builder {
 
     private String[] getMasterCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes,
             RadarGunInstallation rgInstall) throws InterruptedException, IOException {
-        Node master = nodes.getMaster();
+        MasterNode master = nodes.getMaster();
         MasterScriptConfig masterScriptConfig = new MasterShellScript();
         masterScriptConfig.withNumberOfSlaves(nodes.getSlaveCount())
-                .withConfigPath(scenarioSource.getTmpScenarioPath(build)).withMasterHost(master.getHostname())
+                .withConfigPath(scenarioSource.getTmpScenarioPath(build)).withMasterHost(master.getFqdn())
                 .withScriptPath(rgInstall.getExecutable(masterScriptConfig, launcher.getChannel()));
 
         if (pluginPath != null && !pluginPath.isEmpty()) {
@@ -172,7 +173,7 @@ public class RadarGunBuilder extends Builder {
     private String[] getSlaveCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes, int slaveIndex,
             RadarGunInstallation rgInstall) throws InterruptedException, IOException {
         SlaveScriptConfig slaveScriptConfig = new SlaveShellScript();
-        slaveScriptConfig.withSlaveIndex(slaveIndex).withMasterHost(nodes.getMaster().getHostname())
+        slaveScriptConfig.withSlaveIndex(slaveIndex).withMasterHost(nodes.getMaster().getFqdn())
                 .withScriptPath(rgInstall.getExecutable(slaveScriptConfig, launcher.getChannel()));
         
         if (pluginPath != null && !pluginPath.isEmpty()) {
