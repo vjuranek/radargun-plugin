@@ -207,12 +207,14 @@ public class RadarGunBuilder extends Builder {
         // wait for processes to be finished
         try {
             latch.await();
-            for (Future<Integer> retCode : nodeRetCodes) {
+            isSuccess = nodeRetCodes.get(0).get() == 0;
+            //TODO change to warning if some of slaves processes fail?
+            /*for (Future<Integer> retCode : nodeRetCodes) {
                 if (retCode.get() != 0) {
                     isSuccess = false;
                     break;
                 }
-            }
+            }*/
         } catch (InterruptedException e) {
             LOGGER.log(Level.INFO, "Failing the build - build interrupted", e);
             throw new AbortException(e.getMessage());
