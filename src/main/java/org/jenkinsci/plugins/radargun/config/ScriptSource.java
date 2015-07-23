@@ -6,7 +6,9 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import jenkins.model.Jenkins;
@@ -26,12 +28,14 @@ import org.jenkinsci.plugins.radargun.util.Functions;
  */
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
+    public static final String CD_CMD = "cd ";
     public static final String JAVA_PROP_PREFIX = "-D";
     public static final String ENV_CMD = "env ";
     public static final String EXPORT_CMD = "export ";
     public static final char ENV_KEY_VAL_SEPARATOR = '=';
     public static final char ENV_VAR_QUOTE = '"';
     public static final char VAR_SEPARATOR = ' ';
+    public static final char CMD_SEPARATOR = ';';
 
     public abstract String getMasterScriptPath(FilePath workspace) throws InterruptedException, IOException;
 
@@ -47,8 +51,9 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         // And also to gather the log from master
         nodeScriptConfig.withTailFollow().withWait();
         String envVars = node.getEnvVars() == null ? null : prepareEnvVars(node.getEnvVars());
-        String[] remoteExecScriptCmd = envVars == null ? new String[] { nodeScriptPath, node.getHostname() }
-                : new String[] { nodeScriptPath, node.getHostname(), ENV_CMD, envVars };
+        String[] remoteExecScriptCmd = envVars == null ? new String[] { nodeScriptPath, node.getHostname(), CD_CMD,
+                workspace + CMD_SEPARATOR } : new String[] { nodeScriptPath, node.getHostname(), CD_CMD,
+                workspace + CMD_SEPARATOR, ENV_CMD, envVars };
         String[] remoteScript = (String[]) ArrayUtils.addAll(remoteExecScriptCmd, nodeScriptConfig.getScriptCmd());
         return remoteScript;
     }
