@@ -5,6 +5,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a switch in RG shell scripts. Used in classes which describe these script, e.g. {@link MasterScriptConfig}
+ * or {@link SlaveScriptConfig}.
+ * 
+ * @author vjuranek
+ * 
+ */
 public class Option {
 
     private String optionSwitch;

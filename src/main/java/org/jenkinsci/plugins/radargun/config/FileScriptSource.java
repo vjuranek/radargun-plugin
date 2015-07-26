@@ -11,6 +11,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author vjuranek
  * 
  */
+@Deprecated
 public class FileScriptSource extends ScriptSource {
 
     private final String mastertPath;

@@ -6,9 +6,7 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import jenkins.model.Jenkins;
@@ -21,11 +19,15 @@ import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.util.Functions;
 
 /**
- * ScriptSource
+ * Init scripts used for launching RG on remote nodes, typically via ssh. This seems to be redundant and will be removed
+ * soon.
+ * 
+ * TODO replace by more convenient construct or script should be completely generated based on used configuration.
  * 
  * @author vjuranek
  * 
  */
+@Deprecated
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
     public static final String CD_CMD = "cd ";

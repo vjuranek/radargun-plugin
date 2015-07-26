@@ -20,6 +20,11 @@ import org.yaml.snakeyaml.Yaml;
  * automatically.</li>
  * <li>{@code envVars} is a map of environment variables and their values, which should be exported to given host.</li>
  * </ul>
+ * The contract is that the first node is master node. Master node can contain all element slave can contain, but moreover master can 
+ * specify also following options:
+ * <ul>
+ * <li>{@code fqdn} is master FQND or IP address. If not specified, master hostname is used.</li>
+ * </ul>
  * 
  * @author vjuranek
  * 

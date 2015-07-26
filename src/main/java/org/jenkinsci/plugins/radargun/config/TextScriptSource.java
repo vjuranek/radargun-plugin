@@ -13,6 +13,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author vjuranek
  * 
  */
+@Deprecated
 public class TextScriptSource extends ScriptSource {
 
     private final String masterScript;

@@ -11,6 +11,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * @author vjuranek
  * 
  */
+@Deprecated
 public class BuildInScriptSource extends ScriptSource {
 
     private static final String SCRIPT_DIR = "/scripts/";
