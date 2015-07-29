@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.radargun.config;
+package org.jenkinsci.plugins.radargun.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -10,14 +10,13 @@ import java.util.Map;
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
-import org.jenkinsci.plugins.radargun.util.IOUtils;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.junit.Test;
 
-public class YamlNodeConfigParserTest {
+public class ParseUtilsTest {
 
     @Test
-    public void testNodeConfigParser() throws IOException {
+    public void testParseNodeList() throws IOException {
         String config = IOUtils.loadResourceAsString("testNodeConfig.yaml");
         
         assertNotNull("Unable to load test YAML config file", config);
