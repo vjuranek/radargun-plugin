@@ -1,9 +1,10 @@
-package org.jenkinsci.plugins.radargun.config;
+package org.jenkinsci.plugins.radargun.yaml;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.jenkinsci.plugins.radargun.config.NodeConfigParser;
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
