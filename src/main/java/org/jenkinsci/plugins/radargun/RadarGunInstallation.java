@@ -7,12 +7,11 @@ import hudson.Util;
 import hudson.model.EnvironmentSpecific;
 import hudson.model.TaskListener;
 import hudson.model.Node;
-import hudson.remoting.Callable;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.NodeSpecific;
-import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstaller;
 import hudson.tools.ToolProperty;
+import hudson.tools.ToolDescriptor;
 import hudson.tools.ToolInstallation;
 
 import java.io.File;
@@ -21,9 +20,9 @@ import java.util.Collections;
 import java.util.List;
 
 import jenkins.model.Jenkins;
+import jenkins.security.MasterToSlaveCallable;
 
 import org.jenkinsci.plugins.radargun.model.RgScriptConfig;
-import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -55,7 +54,7 @@ public class RadarGunInstallation extends ToolInstallation implements Environmen
      */
     public String getExecutable(final RgScriptConfig executable, VirtualChannel channel) throws IOException,
             InterruptedException {
-        return channel.call(new Callable<String, IOException>() {
+        return channel.call(new MasterToSlaveCallable<String, IOException>() {
 
             public String call() throws IOException {
                 File exec = getExeFile(executable);
@@ -69,10 +68,8 @@ public class RadarGunInstallation extends ToolInstallation implements Environmen
                                 executable.getScriptName()));
             }
 
-            @Override
-            public void checkRoles(RoleChecker arg0) throws SecurityException {
-                //no-op
-            }
+            private static final long serialVersionUID = 1L;
+
         });
     }
 
