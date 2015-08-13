@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.radargun.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Scanner;
 
 public class IOUtils {
@@ -21,6 +22,16 @@ public class IOUtils {
             resourceStr = s.hasNext() ? s.next() : null;
         }
         return resourceStr;
+    }
+    
+    /**
+     * 
+     * @param reousrce path
+     * @return absolute path to the resource
+     */
+    public static String getAbsoluteResourcePath(String path)  {
+        URL resourceUrl = IOUtils.class.getClassLoader().getResource(path);
+        return resourceUrl.getPath();
     }
 
 }

@@ -1,0 +1,13 @@
+nodes:
+- 
+  edg-perf08:
+    fqdn: 172.12.0.8
+    envVars: 
+      jgroups.udp.mcast_addr: 172.12.0.8
+      <<: *defaults
+    jvmOpts: "-server -Xms8g -Xmx8g -XX:+UseLargePages"
+- 
+  edg-perf01:
+    envVars: 
+      jgroups.udp.mcast_addr: 172.12.0.1
+      <<: *defaults

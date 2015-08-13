@@ -1,0 +1,3 @@
+defaults: &defaults
+    infinispan_server1_address: 172.12.0.1
+
