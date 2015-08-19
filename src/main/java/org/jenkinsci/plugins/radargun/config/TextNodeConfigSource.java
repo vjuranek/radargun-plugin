@@ -22,7 +22,7 @@ public class TextNodeConfigSource extends NodeConfigSource {
     
     @Override
     public NodeList getNodesList(Resolver resolver) {
-        return ParseUtils.parseNodeList(nodes);
+        return ParseUtils.parseNodeList(resolver.doResolve(nodes));
     }
     
     @Extension
