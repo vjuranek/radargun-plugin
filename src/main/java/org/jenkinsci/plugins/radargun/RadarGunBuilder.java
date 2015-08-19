@@ -109,11 +109,12 @@ public class RadarGunBuilder extends Builder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
 
+        Resolver.init(build);
+        
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         build.addAction(new RadarGunInvisibleAction(rgInstall.getHome()));
 
-        Resolver resolver = new Resolver(build);
-        NodeList nodes = nodeSource.getNodesList(resolver);
+        NodeList nodes = nodeSource.getNodesList();
         List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
 
         try {

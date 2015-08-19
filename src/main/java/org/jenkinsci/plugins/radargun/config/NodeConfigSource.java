@@ -9,7 +9,6 @@ import java.io.IOException;
 import jenkins.model.Jenkins;
 
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
-import org.jenkinsci.plugins.radargun.util.Resolver;
 
 /**
  * Configuration provider for nodes. Contains information on which nodes RG should run and configration of the node,
@@ -20,7 +19,7 @@ import org.jenkinsci.plugins.radargun.util.Resolver;
  */
 public abstract class NodeConfigSource implements Describable<NodeConfigSource> {
 
-    public abstract NodeList getNodesList(Resolver resolver) throws IOException, InterruptedException;
+    public abstract NodeList getNodesList() throws IOException, InterruptedException;
 
     @Override
     @SuppressWarnings("unchecked")

@@ -17,13 +17,13 @@ import java.util.logging.Logger;
  */
 public class Resolver {
     
-    private final AbstractBuild<?, ?> build;
+    private static AbstractBuild<?, ?> build;
     
-    public Resolver(final AbstractBuild<?, ?> build) {
-        this.build = build;
+    public static void init(final AbstractBuild<?, ?> build) {
+        Resolver.build = build;
     }
     
-    public String doResolve(final String toResolve) {
+    public static String doResolve(final String toResolve) {
         return buildVar(build, toResolve);
     }
 

@@ -25,10 +25,10 @@ public class FileNodeConfigSource extends NodeConfigSource {
     }
     
     @Override
-    public NodeList getNodesList(Resolver resolver) throws IOException, InterruptedException {
-        String nodeListPathRes = resolver.doResolve(nodeListPath);
+    public NodeList getNodesList() throws IOException, InterruptedException {
+        String nodeListPathRes = Resolver.doResolve(nodeListPath);
         FilePath fp = new FilePath(new File(nodeListPathRes));
-        String nodes = resolver.doResolve(fp.readToString());
+        String nodes = Resolver.doResolve(fp.readToString());
         return ParseUtils.parseNodeList(nodes);
     }
     
