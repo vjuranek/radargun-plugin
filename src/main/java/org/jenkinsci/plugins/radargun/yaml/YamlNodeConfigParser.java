@@ -13,6 +13,7 @@ import org.jenkinsci.plugins.radargun.config.NodeConfigParser;
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
+import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -107,13 +108,13 @@ public class YamlNodeConfigParser implements NodeConfigParser {
             if (line.startsWith(INCLUDE_TAG)) {
                 int fpStart = line.indexOf('"');
                 if (fpStart < 0)
-                    throw new IllegalArgumentException("String with file path expected");
+                    throw new IllegalArgumentException("String with file path (in quotes) expected");
                 int fpEnd = line.indexOf('"', fpStart + 1);
                 if (fpEnd < 0 || fpStart == fpEnd)
-                    throw new IllegalArgumentException("String with file path expected");
+                    throw new IllegalArgumentException("String with file path (in quotes) expected");
                 String filePath = line.substring(fpStart + 1, fpEnd);
-                System.out.println("Includeing " + filePath);
-                sb.append(loadFile(filePath));
+                String filePathRes = Resolver.doResolve(filePath);
+                sb.append(loadFile(filePathRes));
             } else {
                 sb.append(line).append(LINE_SEP);
             }

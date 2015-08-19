@@ -23,7 +23,10 @@ public class Resolver {
         Resolver.build = build;
     }
     
-    public static String doResolve(final String toResolve) {
+    public static String doResolve(final String toResolve) throws IllegalStateException {
+        if(build == null)
+            throw new IllegalStateException("Variable resolver was not initialized!");
+        
         return buildVar(build, toResolve);
     }
 
