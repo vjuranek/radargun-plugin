@@ -9,7 +9,6 @@ import hudson.EnvVars;
 import hudson.model.FreeStyleBuild;
 import hudson.model.AbstractBuild;
 import hudson.util.LogTaskListener;
-import hudson.util.VariableResolver;
 
 import java.io.IOException;
 import java.util.HashMap;
