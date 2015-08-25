@@ -33,7 +33,7 @@ public class ParseUtilsTest {
         assertEquals("172.12.0.1", envVars.get("infinispan_server1_address"));
         Map<String, String> javaProps = master.getJavaProps();
         assertNotNull(javaProps);
-        assertEquals("192.168.117.12:7800;192.168.117.13:7800; 192.168.117.14:7800;", javaProps.get("site.default_site.tcp"));
+        assertEquals("192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;", javaProps.get("site.default_site.tcp"));
         
         assertEquals(1, nodes.getSlaveCount());
         Node slave = nodes.getNodes().get(1);
@@ -45,6 +45,6 @@ public class ParseUtilsTest {
         assertEquals("172.12.0.1", envVars.get("infinispan_server1_address"));
         javaProps = slave.getJavaProps();
         assertNotNull(javaProps);
-        assertEquals("192.168.117.12:7800;192.168.117.13:7800; 192.168.117.14:7800;", javaProps.get("site.default_site.tcp"));
+        assertEquals("192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;", javaProps.get("site.default_site.tcp"));
     }
 }
