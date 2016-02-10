@@ -223,6 +223,9 @@ public class RadarGunBuilder extends Builder {
         } catch (ExecutionException e) {
             LOGGER.log(Level.INFO, "Failing the build - getting master result has failed", e);
             throw new AbortException(e.getMessage());
+        } finally {
+            List<Runnable> notStarted = executorService.shutdownNow();
+            LOGGER.log(Level.FINE, "Number of tasks that weren't started: " + notStarted.size());
         }
 
         return isSuccess;
