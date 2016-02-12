@@ -1,0 +1,6 @@
+= Jenkins RadarGun Plugin
+
+Jenkins plugin for https://github.com/radargun/radargun/[RadaGun].
+
+https://github.com/radargun/radargun/[RadaGun] is a data grid and distributed cache benchmarking framework built to test http://www.infinispan.org/[Infinispan] and other distributed data grid platforms.
+This plugin allows to run RadarGun benchmark as a Jenkins build step.
