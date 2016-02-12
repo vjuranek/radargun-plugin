@@ -4,3 +4,72 @@ Jenkins plugin for https://github.com/radargun/radargun/[RadaGun].
 
 https://github.com/radargun/radargun/[RadaGun] is a data grid and distributed cache benchmarking framework built to test http://www.infinispan.org/[Infinispan] and other distributed data grid platforms.
 This plugin allows to run RadarGun benchmark as a Jenkins build step.
+
+== Configuration
+=== Global configuration
+First, you need to configure path to RadarGun distribution.
+Navigate to main Jenkins global configuration page, `$JENKINS_URL/configure`.
+Click `Add RadarGun`, specify name of the RG distribution and full path to the distribution.
+Distribution is expected to be unzipped in specified directory.
+Also, the directory has to be available on all RG nodes.
+Jenkins allows to install the tool automatically when it's missing on some machine.
+Unfortunately, this is not implemented yet, so please specify always installation directory.
+
+=== Job configuration
+On job config page, click on `Add build step` and choose `Run RadarGun`.
+There are four fields, `RadarGun instance`, `RadarGun scenario`, `Node list` and `Start script`.
+
+==== RadarGun instance
+Just choose one of the RG instances you configured on Jenkins global config page.
+
+==== RadarGun scenario
+Specifies RG scenario to be run. You can specify either path to the scenario or provide scenario XML directly in job config page.
+Path to scenario as well as scenario itself can contain Jenkins and environment variables which get expanded before use.
+
+==== Node list
+Probably the most complex part of the configuration, which specifies on which nodes RG master and slaves should run and also allows to adjust parameters used in RG scenarios.
+It's in YAML format and can contain Jenkins and environment variables.
+Again, variables get expanded before use.
+
+
+Config can contain arbitrary sections, which are valid YAML components.
+The only mandatory section is node list, which is a list starting with name `nodes:`.
+Each list item is one node, the first one is RG master, remaining ones RG slaves.
+Each is represented by its hostname and optionally can contain map of other options.
+Following options can be used:
+
+* `jvmOpts`: plain string containing JVM options like `-Xmx` etc.
+* `javaProps`: a map of java properties. Typically should be used for setting up parameters used in RG scenarios. Properties are entered without "-D" prefix, this will be added later on automatically.
+* `envVars`: a map of environment variables and their values, which should be exported to given host.
+* `fqdn`: master FQND or IP address, i.e. valid only for master node. If not specified, master hostname is used.
+
+As mentioned above, only valid YAML elements are allows.
+With one exception - YAML allows to define some elements are referred it later on.
+However, it doesn't allow to include other files.
+This can be quite annoying as one wants to e.g. have default env. variable in one file and not copy it into each config.
+Therefore, plugin allows to use `!include` directive, which allows to include other files.
+File is inserted into the place where include directive is placed.
+As this is not a valid YAML directive, it should be used only when necessary a **last resort!**. 
+
+You can check https://github.com/jenkinsci/radargun-plugin/tree/master/src/test/resources[test resources folder], which contains examples of YAML config for tests. 
+
+==== Start script
+Specifies RG master and slave script to be used to starting and RG master and slaves.
+This provides opportunity for the user to tweak command constructed by the plugin.
+It also allows to switch to other remote connection program, other than `ssh`.
+Usually it's sufficient to provide
+[source, shell]
+----
+#!/bin/bash
+set -x
+ssh $@
+----
+This option is deprecated and will be probably removed in the future.
+
+
+=== Job results
+If RadarGun fails, i.e. RG master returns non-zero return code, Jenkins will fail the build.
+Once RG master or slave is started, Jenkins will create a link on the build page on upper-left side, which contains master or slave log.
+If the build is in progress, logs are update automatically.
+Besides logs, RG plugin doesn't do any archiving of build artifacts.
+If you want to archive RG results, you needs to add `Archive the artifacts` post-build action and configure pattern which artifacts should be archived, usually `results/\**/*`.
