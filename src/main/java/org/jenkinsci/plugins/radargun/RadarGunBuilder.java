@@ -233,9 +233,13 @@ public class RadarGunBuilder extends Builder {
 
     private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)
             throws IOException, InterruptedException {
-        BuildListener logListener = new StreamBuildListener(log, Charset.defaultCharset());
         FilePath workspace = workspacePath == null ? build.getWorkspace() : new FilePath(new File(Resolver.buildVar(
                 build, workspacePath)));
+        if (!workspace.exists()) {
+            throw new IOException(String.format("Workspace path '%s' doesn't exists! Check your job configuration!", workspace.getRemote()));
+        }
+        
+        BuildListener logListener = new StreamBuildListener(log, Charset.defaultCharset());
         ProcStarter procStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(logListener))
                 .pwd(workspace).stdout(logListener);
         return procStarter;
