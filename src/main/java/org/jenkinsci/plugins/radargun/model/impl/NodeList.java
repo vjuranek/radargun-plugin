@@ -27,6 +27,10 @@ public class NodeList {
         return nodes;
     }
 
+    public List<Node> asList() {
+        return nodes;
+    }
+    
     public MasterNode getMaster() {
         return (MasterNode)nodes.get(0);
     }

@@ -8,7 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
+import org.jenkinsci.plugins.radargun.RadarGunBuilder;
 import org.jenkinsci.plugins.radargun.config.NodeConfigParser;
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
@@ -36,8 +38,11 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class YamlNodeConfigParser implements NodeConfigParser {
 
+    private static Logger LOGGER = Logger.getLogger(YamlNodeConfigParser.class.getName());
+    
     public static final String NODES_KEY = "nodes";
     public static final String FQDN = "fqdn";
+    @Deprecated
     public static final String JVM_OPTS_KEY = "jvmOpts";
     public static final String JAVA_PROPS_KEY = "javaProps";
     public static final String ENV_VARS_KEY = "envVars";
@@ -84,6 +89,9 @@ public class YamlNodeConfigParser implements NodeConfigParser {
     private Node parseNode(String name, Map<String, Object> nodeConfig) {
         String fqdn = nodeConfig.containsKey(FQDN) ? (String) nodeConfig.get(FQDN) : null;
         String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String) nodeConfig.get(JVM_OPTS_KEY) : null;
+        if (jvmOpts != null) {
+            LOGGER.warning("Setting up JVM options via RG jenkins plugin is deprecated and will be removed. Please use RG 3 or higher and set up JVM options direcly in RG!");
+        }
         @SuppressWarnings("unchecked")
         Map<String, String> javaProps = nodeConfig.containsKey(JAVA_PROPS_KEY) ? (Map<String, String>) nodeConfig
                 .get(JAVA_PROPS_KEY) : null;

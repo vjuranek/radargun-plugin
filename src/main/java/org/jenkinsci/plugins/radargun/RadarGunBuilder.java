@@ -42,6 +42,7 @@ import org.jenkinsci.plugins.radargun.model.impl.MasterShellScript;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.model.impl.SlaveShellScript;
+import org.jenkinsci.plugins.radargun.util.Functions;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -117,6 +118,9 @@ public class RadarGunBuilder extends Builder {
         NodeList nodes = nodeSource.getNodesList();
         List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
 
+        //check deprecated options
+        Functions.checkDeprecatedConfigs(nodes, listener);
+        
         try {
             // master start script
             RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getName(),

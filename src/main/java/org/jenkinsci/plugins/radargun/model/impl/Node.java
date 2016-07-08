@@ -6,6 +6,7 @@ public class Node {
 
     private final String name; // name of the node. If fqdn is not specified, it's assumes that this is the hostname
     private final String fqdn; // fully qualified domain name
+    @Deprecated
     private final String jvmOptions; // additional JVM settings, like -Xmx
     private final Map<String, String> javaProps; // java properties, typically some RG scenatio variables, "-D" prefix
                                                  // will be automatically added
@@ -47,6 +48,11 @@ public class Node {
         return fqdn != null ? getFqdn() : getName();
     }
     
+    /**
+     * As of RG 3.0 JVM options setup is supported directly by RG and this is the preferred way how to setup JVM options.
+     * Once RG 2.X is oboslete, this options will be removed!
+     */
+    @Deprecated
     public String getJvmOptions() {
         if(jvmOptions == null || jvmOptions.isEmpty())
             return null;

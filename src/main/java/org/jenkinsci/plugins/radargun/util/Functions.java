@@ -1,9 +1,13 @@
 package org.jenkinsci.plugins.radargun.util;
 
-import hudson.FilePath;
-
 import java.io.File;
 import java.io.IOException;
+
+import org.jenkinsci.plugins.radargun.model.impl.Node;
+import org.jenkinsci.plugins.radargun.model.impl.NodeList;
+
+import hudson.FilePath;
+import hudson.model.BuildListener;
 
 /**
  * 
@@ -35,5 +39,13 @@ public class Functions {
     public static void makeExecutable(String filePath) {
         File msf = new File(filePath);
         msf.setExecutable(true);
+    }
+    
+    public static void checkDeprecatedConfigs(NodeList nodes, BuildListener listener) {
+        for (Node node : nodes.asList()) {
+            if (node.getJvmOptions() != null) {
+                listener.getLogger().println("Setting up JVM options via RG jenkins plugin is deprecated and will be removed. Please use RG 3 or higher and set up JVM options direcly in RG!");
+            }
+        }
     }
 }
