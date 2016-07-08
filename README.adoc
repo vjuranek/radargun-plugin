@@ -38,7 +38,7 @@ Each list item is one node, the first one is RG master, remaining ones RG slaves
 Each is represented by its hostname and optionally can contain map of other options.
 Following options can be used:
 
-* `jvmOpts`: plain string containing JVM options like `-Xmx` etc.
+* [line-through]#`jvmOpts`#: plain string containing JVM options like `-Xmx` etc. This option is *deprecated* and will be removed in the future. As of RG 3.0, JVM options can be specified direcly in RG scenarios and this options is strogly preffered!
 * `javaProps`: a map of java properties. Typically should be used for setting up parameters used in RG scenarios. Properties are entered without "-D" prefix, this will be added later on automatically.
 * `envVars`: a map of environment variables and their values, which should be exported to given host.
 * `fqdn`: master FQND or IP address, i.e. valid only for master node. If not specified, master hostname is used.
