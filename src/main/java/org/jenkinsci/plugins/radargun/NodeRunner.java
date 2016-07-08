@@ -1,12 +1,11 @@
 package org.jenkinsci.plugins.radargun;
 
-import hudson.Launcher.ProcStarter;
-import hudson.Proc;
-
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import hudson.Launcher.ProcStarter;
+import hudson.Proc;
 
 public class NodeRunner implements Callable<Integer> {
     
@@ -14,16 +13,16 @@ public class NodeRunner implements Callable<Integer> {
     
     private final ProcStarter procStarter;
     private final RadarGunNodeAction nodeAction;
-    private CountDownLatch latch;
+    //private CountDownLatch latch;
     
     public NodeRunner(ProcStarter procStarter, RadarGunNodeAction nodeAction) {
         this.procStarter = procStarter;
         this.nodeAction = nodeAction;
     }
 
-    public void setLatch(final CountDownLatch latch) {
+    /*public void setLatch(final CountDownLatch latch) {
         this.latch = latch;
-    }
+    }*/
     
     @Override
     public Integer call() {
@@ -39,7 +38,7 @@ public class NodeRunner implements Callable<Integer> {
             LOGGER.log(Level.INFO, String.format("Node runner %s failed", nodeAction.getDisplayName()), e);
         } finally {
             nodeAction.setInProgress(false);
-            latch.countDown();
+            //latch.countDown();
         }
         return retCode;
     }

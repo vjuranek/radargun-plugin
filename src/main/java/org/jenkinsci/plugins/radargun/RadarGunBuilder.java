@@ -1,22 +1,5 @@
 package org.jenkinsci.plugins.radargun;
 
-import hudson.AbortException;
-import hudson.CopyOnWrite;
-import hudson.DescriptorExtensionList;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.Launcher.ProcStarter;
-import hudson.Util;
-import hudson.model.BuildListener;
-import hudson.model.StreamBuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Descriptor;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.Builder;
-import hudson.util.ListBoxModel;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,8 +12,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import net.sf.json.JSONObject;
 
 import org.jenkinsci.plugins.radargun.config.NodeConfigSource;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
@@ -46,6 +27,24 @@ import org.jenkinsci.plugins.radargun.util.Functions;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+
+import hudson.AbortException;
+import hudson.CopyOnWrite;
+import hudson.DescriptorExtensionList;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.Launcher.ProcStarter;
+import hudson.Util;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.model.Descriptor;
+import hudson.model.StreamBuildListener;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
+import hudson.util.ListBoxModel;
+import net.sf.json.JSONObject;
 
 public class RadarGunBuilder extends Builder {
 
@@ -205,14 +204,14 @@ public class RadarGunBuilder extends Builder {
         // submit runners
         List<Future<Integer>> nodeRetCodes = new ArrayList<Future<Integer>>(nodeCount);
         for (NodeRunner runner : nodeRunners) {
-            runner.setLatch(latch);
+            //runner.setLatch(latch);
             nodeRetCodes.add(executorService.submit(runner));
         }
 
         boolean isSuccess = true;
         // wait for processes to be finished
         try {
-            latch.await();
+            //latch.await();
             isSuccess = nodeRetCodes.get(0).get() == 0;
             //TODO change to warning if some of slaves processes fail?
             /*for (Future<Integer> retCode : nodeRetCodes) {
