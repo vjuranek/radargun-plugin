@@ -4,30 +4,49 @@ import java.util.Map;
 
 public class Node {
 
-    private final String hostname;
+    private final String name; // name of the node. If fqdn is not specified, it's assumes that this is the hostname
+    private final String fqdn; // fully qualified domain name
     private final String jvmOptions; // additional JVM settings, like -Xmx
     private final Map<String, String> javaProps; // java properties, typically some RG scenatio variables, "-D" prefix
                                                  // will be automatically added
     private final Map<String, String> envVars;
 
-    public Node(String hostname) {
-        this.hostname = hostname;
+    public Node(String name) {
+        this.name = name;
+        this.fqdn = null;
+        this.jvmOptions = null;
+        this.javaProps = null;
+        this.envVars = null;
+    }
+    
+    public Node(String name, String fqdn) {
+        this.name = name;
+        this.fqdn = fqdn;
         this.jvmOptions = null;
         this.javaProps = null;
         this.envVars = null;
     }
 
-    public Node(String hostname, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars) {
-        this.hostname = hostname;
+    public Node(String name, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars) {
+        this.name = name;
+        this.fqdn = fqdn;
         this.jvmOptions = jvmOptions;
         this.javaProps = javaProps;
         this.envVars = envVars;
     }
 
-    public String getHostname() {
-        return hostname;
+    public String getName() {
+        return name;
+    }
+    
+    public String getFqdn() {
+        return fqdn;
     }
 
+    public String getHostname() {
+        return fqdn != null ? getFqdn() : getName();
+    }
+    
     public String getJvmOptions() {
         if(jvmOptions == null || jvmOptions.isEmpty())
             return null;

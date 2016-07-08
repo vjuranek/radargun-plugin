@@ -58,7 +58,7 @@ public class IncludeTest {
 
         MasterNode master = (MasterNode) nodes.getMaster();
         assertEquals("172.12.0.8", master.getFqdn());
-        assertEquals("edg-perf08", master.getHostname());
+        assertEquals("edg-perf08", master.getName());
         assertEquals("-server -Xms8g -Xmx8g -XX:+UseLargePages", master.getJvmOptions());
         Map<String, String> envVars = master.getEnvVars();
         assertNotNull(envVars);
@@ -67,7 +67,7 @@ public class IncludeTest {
 
         assertEquals(1, nodes.getSlaveCount());
         Node slave = nodes.getNodes().get(1);
-        assertEquals("edg-perf01", slave.getHostname());
+        assertEquals("edg-perf01", slave.getName());
         assertNull(slave.getJvmOptions());
         envVars = slave.getEnvVars();
         assertNotNull(envVars);

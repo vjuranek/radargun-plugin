@@ -119,7 +119,7 @@ public class RadarGunBuilder extends Builder {
 
         try {
             // master start script
-            RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getHostname(),
+            RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getName(),
                     "RadarGun master ");
             build.addAction(masterAction);
             String[] masterCmdLine = getMasterCmdLine(build, launcher, nodes, rgInstall);
@@ -130,7 +130,7 @@ public class RadarGunBuilder extends Builder {
             List<Node> slaves = nodes.getSlaves();
             for (int i = 0; i < slaves.size(); i++) {
                 Node slave = slaves.get(i);
-                RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getHostname());
+                RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getName());
                 build.addAction(slaveAction);
 
                 String[] slaveCmdLine = getSlaveCmdLine(build, launcher, nodes, i, rgInstall);

@@ -4,31 +4,24 @@ import java.util.Map;
 
 /**
  * Represents RG master node and keeps it's configuration.
+ * Currently not special configuration for master is needed.
+ * Kept as a marker class.
  * 
  * @author vjuranek
  *
  */
 public class MasterNode extends Node {
     
-    private final String fqdn;
-    
-    public MasterNode(Node node, String fqdn) {
-        super(node.getHostname(), node.getJvmOptions(), node.getJavaProps(), node.getEnvVars());
-        this.fqdn = fqdn;
+    public MasterNode(Node node) {
+        super(node.getName(), node.getFqdn(), node.getJvmOptions(), node.getJavaProps(), node.getEnvVars());
     }
     
-    public MasterNode(String hostname, String fqdn) {
-        super(hostname);
-        this.fqdn = fqdn;
+    public MasterNode(String name, String fqdn) {
+        super(name, fqdn);
     }
 
-    public MasterNode(String hostname, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, String fqdn) {
-        super(hostname, jvmOptions, javaProps, envVars);
-        this.fqdn = fqdn;
-    }
-    
-    public String getFqdn() {
-        return fqdn;
+    public MasterNode(String hostname, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars) {
+        super(hostname, fqdn, jvmOptions, javaProps, envVars);
     }
 
 }

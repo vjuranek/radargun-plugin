@@ -17,7 +17,7 @@ public class NodeTest {
         javaProps.put("site.default_site.udp", "192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000;");
         Map<String, String> envVars = new HashMap<>();
         envVars.put("infinispan_server1_address", "172.12.0.1");
-        Node node = new Node("test_hostname", "-server -Xms8g -Xmx8g -XX:+UseLargePages", javaProps, envVars);
+        Node node = new Node("test_hostname", null, "-server -Xms8g -Xmx8g -XX:+UseLargePages", javaProps, envVars);
         assertNotNull(node.getAllJavaOpts());
         assertEquals(
                 " '-server -Xms8g -Xmx8g -XX:+UseLargePages -Dsite.default_site.udp=192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000; -Dsite.default_site.tcp=192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800; '",
@@ -31,7 +31,7 @@ public class NodeTest {
         javaProps.put("site.default_site.udp", "192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000;");
         Map<String, String> envVars = new HashMap<>();
         envVars.put("infinispan_server1_address", "172.12.0.1");
-        Node node = new Node("test_hostname", null, javaProps, envVars);
+        Node node = new Node("test_hostname", null, null, javaProps, envVars);
         assertNotNull(node.getAllJavaOpts());
         assertEquals(
                 " '-Dsite.default_site.udp=192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000; -Dsite.default_site.tcp=192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800; '",
@@ -42,8 +42,15 @@ public class NodeTest {
     public void testJvmOptsOnly() {
         Map<String, String> envVars = new HashMap<>();
         envVars.put("infinispan_server1_address", "172.12.0.1");
-        Node node = new Node("test_hostname", "-server -Xms8g -Xmx8g -XX:+UseLargePages", null, envVars);
+        Node node = new Node("test_hostname", null, "-server -Xms8g -Xmx8g -XX:+UseLargePages", null, envVars);
         assertNotNull(node.getAllJavaOpts());
         assertEquals(" '-server -Xms8g -Xmx8g -XX:+UseLargePages '", node.getAllJavaOpts());
+    }
+    
+    public void testHostname() {
+        Node node1  = new Node("test_name", "test_fqdn", null, null, null);
+        assertEquals("test_fqdn", node1.getHostname());
+        Node node2  = new Node("test_name", null, null, null, null);
+        assertEquals("test_name", node2.getHostname());
     }
 }

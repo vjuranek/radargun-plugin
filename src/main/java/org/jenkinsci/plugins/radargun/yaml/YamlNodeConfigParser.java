@@ -18,20 +18,18 @@ import org.yaml.snakeyaml.Yaml;
 
 /**
  * {@link NodeConfigParser} for YAML configurations. YAML file can contain arbitrary section, the only required is
- * {@code nodes} list, containing list of nodes, each represented by it's hostname followed by a map of options. This
- * oprions can contain following elements:
+ * {@code nodes} list, containing list of nodes, each represented by it's name followed by a map of options. This
+ * options can contain following elements:
  * <ul>
+ * <li>{@code fqdn} is node FQND or IP address. If not specified, node name is used as a hostname.</li>
  * <li>{@code jvmOtions} and {@code envVars}. {@code jvmOtions} is a plain string containing JVM options like -Xmx etc.</li>
  * <li>{@code javaProps} is a map of java propertied to be passed to RG startup script. Typically should be used for
  * setting up variables used in RG scenarios. Properties are entered without "-D" prefix, this will be added later on
  * automatically.</li>
  * <li>{@code envVars} is a map of environment variables and their values, which should be exported to given host.</li>
  * </ul>
- * The contract is that the first node is master node. Master node can contain all element slave can contain, but
- * moreover master can specify also following options:
- * <ul>
- * <li>{@code fqdn} is master FQND or IP address. If not specified, master hostname is used.</li>
- * </ul>
+ * The contract is that the first node is master node. Master node can contain all element slave can contain, 
+ * no special master configuration is currently supported.
  * 
  * @author vjuranek
  * 
@@ -39,7 +37,7 @@ import org.yaml.snakeyaml.Yaml;
 public class YamlNodeConfigParser implements NodeConfigParser {
 
     public static final String NODES_KEY = "nodes";
-    public static final String MASTER_FQDN = "fqdn";
+    public static final String FQDN = "fqdn";
     public static final String JVM_OPTS_KEY = "jvmOpts";
     public static final String JAVA_PROPS_KEY = "javaProps";
     public static final String ENV_VARS_KEY = "envVars";
@@ -83,7 +81,8 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         return new NodeList(master, nodes);
     }
 
-    private Node parseNode(String hostname, Map<String, Object> nodeConfig) {
+    private Node parseNode(String name, Map<String, Object> nodeConfig) {
+        String fqdn = nodeConfig.containsKey(FQDN) ? (String) nodeConfig.get(FQDN) : null;
         String jvmOpts = nodeConfig.containsKey(JVM_OPTS_KEY) ? (String) nodeConfig.get(JVM_OPTS_KEY) : null;
         @SuppressWarnings("unchecked")
         Map<String, String> javaProps = nodeConfig.containsKey(JAVA_PROPS_KEY) ? (Map<String, String>) nodeConfig
@@ -91,13 +90,12 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         @SuppressWarnings("unchecked")
         Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>) nodeConfig
                 .get(ENV_VARS_KEY) : null;
-        return new Node(hostname, jvmOpts, javaProps, envVars);
+        return new Node(name, fqdn, jvmOpts, javaProps, envVars);
     }
 
-    private MasterNode parseMasterNode(String hostname, Map<String, Object> nodeConfig) {
-        Node node = parseNode(hostname, nodeConfig);
-        String fqdn = nodeConfig.containsKey(MASTER_FQDN) ? (String) nodeConfig.get(MASTER_FQDN) : hostname;
-        return new MasterNode(node, fqdn);
+    private MasterNode parseMasterNode(String name, Map<String, Object> nodeConfig) {
+        Node node = parseNode(name, nodeConfig);
+        return new MasterNode(node);
     }
 
     private String expandIncludes(String orig) {
