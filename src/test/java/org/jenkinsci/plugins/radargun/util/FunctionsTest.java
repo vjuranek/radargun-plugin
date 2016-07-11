@@ -26,18 +26,6 @@ public class FunctionsTest {
     }
     
     @Test
-    public void testCmdArrayToString() {
-        String[] cmd = {"aaa", "bbb", "ccc"};
-        assertEquals("aaa bbb ccc", Functions.cmdArrayToString(cmd));
-        cmd = new String[] {"aaa"};
-        assertEquals("aaa", Functions.cmdArrayToString(cmd));
-        cmd = new String[] {"aaa", "'bbb'"};
-        assertEquals("aaa 'bbb'", Functions.cmdArrayToString(cmd));
-        cmd = new String[] {"aaa; bbb", "ccc"};
-        assertEquals("aaa; bbb ccc", Functions.cmdArrayToString(cmd));
-    }
-    
-    @Test
     public void testMakeExecutable() throws Exception {
         File f = File.createTempFile("test", ".sh");
         Functions.makeExecutable(f.getAbsolutePath());
