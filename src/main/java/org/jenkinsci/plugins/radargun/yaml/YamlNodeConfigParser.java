@@ -46,6 +46,8 @@ public class YamlNodeConfigParser implements NodeConfigParser {
     public static final String JVM_OPTS_KEY = "jvmOpts";
     public static final String JAVA_PROPS_KEY = "javaProps";
     public static final String ENV_VARS_KEY = "envVars";
+    public static final String BEFORE_CMDS = "beforeCmds";
+    public static final String AFTER_CMDS = "afterCmds";
 
     public static final String LINE_SEP = System.getProperty("line.separator");
     public static final String EOF_REG_EXP = "\\A";
@@ -98,7 +100,11 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         @SuppressWarnings("unchecked")
         Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>) nodeConfig
                 .get(ENV_VARS_KEY) : null;
-        return new Node(name, fqdn, jvmOpts, javaProps, envVars);
+        @SuppressWarnings("unchecked")
+        List<String> beforeCmds = nodeConfig.containsKey(BEFORE_CMDS) ? (List<String>) nodeConfig.get(BEFORE_CMDS) : null;
+        @SuppressWarnings("unchecked")
+        List<String> afterCmds = nodeConfig.containsKey(AFTER_CMDS) ? (List<String>) nodeConfig.get(AFTER_CMDS) : null;
+        return new Node(name, fqdn, jvmOpts, javaProps, envVars, beforeCmds, afterCmds);
     }
 
     private MasterNode parseMasterNode(String name, Map<String, Object> nodeConfig) {

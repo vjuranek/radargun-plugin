@@ -5,12 +5,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
-import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.junit.Test;
 
 public class ParseUtilsTest {
@@ -34,6 +34,15 @@ public class ParseUtilsTest {
         Map<String, String> javaProps = master.getJavaProps();
         assertNotNull(javaProps);
         assertEquals("192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;", javaProps.get("site.default_site.tcp"));
+        List<String> beforeCmds = master.getBeforeCmds();
+        assertNotNull(beforeCmds);
+        assertEquals(2, beforeCmds.size());
+        assertEquals("echo \"aaa\" > /tmp/aaa.txt", beforeCmds.get(0));
+        assertEquals("ls -la /tmp", beforeCmds.get(1));
+        List<String> afterCmds = master.getAfterCmds();
+        assertNotNull(afterCmds);
+        assertEquals(1, afterCmds.size());
+        assertEquals("rm -rf /tmp/aaa.txt", afterCmds.get(0));
         
         assertEquals(1, nodes.getSlaveCount());
         Node slave = nodes.getNodes().get(1);
@@ -46,5 +55,11 @@ public class ParseUtilsTest {
         javaProps = slave.getJavaProps();
         assertNotNull(javaProps);
         assertEquals("192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;", javaProps.get("site.default_site.tcp"));
+        beforeCmds = slave.getBeforeCmds();
+        assertNotNull(beforeCmds);
+        assertEquals(1, beforeCmds.size());
+        assertEquals("rm -rf /tmp/aaa.txt", beforeCmds.get(0));
+        afterCmds = slave.getAfterCmds();
+        assertNull(afterCmds);
     }
 }

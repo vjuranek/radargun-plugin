@@ -11,6 +11,11 @@ nodes:
     jvmOpts: "-server -Xms8g -Xmx8g -XX:+UseLargePages"
     javaProps:
       site.default_site.tcp: 192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;
+    beforeCmds:
+      - echo "aaa" > /tmp/aaa.txt
+      - ls -la /tmp
+    afterCmds:
+      - rm -rf /tmp/aaa.txt
 - 
   edg-perf01:
     envVars: 
@@ -18,3 +23,5 @@ nodes:
       <<: *defaults
     javaProps:
       site.default_site.tcp: 192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;
+    beforeCmds:
+      - rm -rf /tmp/aaa.txt

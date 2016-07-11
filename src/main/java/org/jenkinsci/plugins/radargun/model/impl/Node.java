@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.radargun.model.impl;
 
+import java.util.List;
 import java.util.Map;
 
 public class Node {
@@ -11,6 +12,8 @@ public class Node {
     private final Map<String, String> javaProps; // java properties, typically some RG scenatio variables, "-D" prefix
                                                  // will be automatically added
     private final Map<String, String> envVars;
+    private final List<String> beforeCmds;
+    private final List<String> afterCmds;
 
     public Node(String name) {
         this.name = name;
@@ -18,6 +21,8 @@ public class Node {
         this.jvmOptions = null;
         this.javaProps = null;
         this.envVars = null;
+        this.beforeCmds = null;
+        this.afterCmds = null;
     }
     
     public Node(String name, String fqdn) {
@@ -26,14 +31,18 @@ public class Node {
         this.jvmOptions = null;
         this.javaProps = null;
         this.envVars = null;
+        this.beforeCmds = null;
+        this.afterCmds = null;
     }
 
-    public Node(String name, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars) {
+    public Node(String name, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds) {
         this.name = name;
         this.fqdn = fqdn;
         this.jvmOptions = jvmOptions;
         this.javaProps = javaProps;
         this.envVars = envVars;
+        this.beforeCmds = beforeCmds;
+        this.afterCmds = afterCmds;
     }
 
     public String getName() {
@@ -65,6 +74,14 @@ public class Node {
 
     public Map<String, String> getEnvVars() {
         return envVars;
+    }
+    
+    public List<String> getBeforeCmds() {
+        return beforeCmds;
+    }
+    
+    public List<String> getAfterCmds() {
+        return afterCmds;
     }
 
     public String getJavaPropsWithPrefix() {

@@ -2,7 +2,9 @@ package org.jenkinsci.plugins.radargun.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 
@@ -47,5 +49,16 @@ public class Functions {
                 listener.getLogger().println("Setting up JVM options via RG jenkins plugin is deprecated and will be removed. Please use RG 3 or higher and set up JVM options direcly in RG!");
             }
         }
+    }
+    
+    public static String[] userCmdsToArray(List<String> userCmds, char cmdSep, boolean sepCharBefore) {
+        String cmdSepStr = Character.toString(cmdSep);
+        String[] cmds = sepCharBefore ? new String[] {cmdSepStr} : new String[] {};
+        for (String cmd : userCmds) {
+            cmds = (String[])ArrayUtils.addAll(cmds, cmd.split(" "));
+            cmds = (String[])ArrayUtils.add(cmds, cmdSepStr);
+        }
+        cmds = sepCharBefore ? (String[])ArrayUtils.remove(cmds, cmds.length - 1) : cmds; 
+        return cmds;
     }
 }

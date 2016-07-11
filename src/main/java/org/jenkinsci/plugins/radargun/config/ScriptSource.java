@@ -48,16 +48,27 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
     public String[] getNodeCmdLine(String nodeScriptPath, Node node, NodeScriptConfig nodeScriptConfig, String workspace)
             throws InterruptedException, IOException {
         Functions.makeExecutable(nodeScriptPath);
+        //path to init script (typically ssh) and hostname of the machine where subsequent commands should be executed
+        //also changes pwd to workspace 
+        String[] cmd = new String[] { nodeScriptPath, node.getHostname(), CD_CMD, workspace + CMD_SEPARATOR  };
+        
+        //set up user init commands
+        cmd = node.getBeforeCmds() == null ? cmd : (String[])ArrayUtils.addAll(cmd, Functions.userCmdsToArray(node.getBeforeCmds(), CMD_SEPARATOR, false));
+        
+        //eventually setup environment whehe RG scripts should be executed
+        //env cmd takes as a parameter command which needs to be executed in given env, so this needs to be right before RG script is added 
+        //into cmd array
+        cmd = node.getEnvVars() == null ? cmd : (String[]) ArrayUtils.addAll(cmd, new String[] { ENV_CMD, prepareEnvVars(node.getEnvVars()) });
+        
         // Run with "tail" option ("-t") not to finish immediately once the RG process is started.
         // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
         // And also to gather the log from master
         nodeScriptConfig.withTailFollow().withWait();
-        String envVars = node.getEnvVars() == null ? null : prepareEnvVars(node.getEnvVars());
-        String[] remoteExecScriptCmd = envVars == null ? new String[] { nodeScriptPath, node.getHostname(), CD_CMD,
-                workspace + CMD_SEPARATOR } : new String[] { nodeScriptPath, node.getHostname(), CD_CMD,
-                workspace + CMD_SEPARATOR, ENV_CMD, envVars };
-        String[] remoteScript = (String[]) ArrayUtils.addAll(remoteExecScriptCmd, nodeScriptConfig.getScriptCmd());
-        return remoteScript;
+        cmd = (String[]) ArrayUtils.addAll(cmd, nodeScriptConfig.getScriptCmd());
+        
+        //set up user after commands
+        cmd = node.getAfterCmds() == null ? cmd : (String[])ArrayUtils.addAll(cmd, Functions.userCmdsToArray(node.getAfterCmds(), CMD_SEPARATOR, true));
+        return cmd;
     }
 
     public String[] getMasterCmdLine(FilePath workspace, Node node, MasterScriptConfig nodeScriptConfig)

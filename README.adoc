@@ -42,6 +42,8 @@ Following options can be used:
 * `javaProps`: a map of java properties. Typically should be used for setting up parameters used in RG scenarios. Properties are entered without "-D" prefix, this will be added later on automatically.
 * `envVars`: a map of environment variables and their values, which should be exported to given host.
 * `fqdn`: master FQND or IP address, i.e. valid only for master node. If not specified, master hostname is used.
+* `beforeCmds`: list of commands which will be executed before RG script on given node is started
+* `afterCmds`: list of commands which will be executed after RG script on given node finishes
 
 As mentioned above, only valid YAML elements are allows.
 With one exception - YAML allows to define some elements are referred it later on.
