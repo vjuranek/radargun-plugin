@@ -2,10 +2,9 @@
     xmlns:f="/lib/form">
 
     <f:entry field="scenario">
-        <!-- <f:textarea checkMethod="post" codemirror-mode="xml"
-            codemirror-config="mode: 'text/xml', lineNumbers: true, matchBrackets: true, onBlur: function(editor){editor.save()}" /> -->
-        <f:textarea />    
+        <f:textarea checkMethod="post" codemirror-mode="xml"
+            codemirror-config="mode: 'text/xml', lineNumbers: true, matchBrackets: true, onBlur: function(editor){editor.save()}" />
     </f:entry>
-    <!-- <f:validateButton title="Check syntax" progress="Checking syntax ... " method="checkScript" with="scenario" /> -->
+    <!-- <f:validateButton title="Check syntax" progress="Checking syntax ... " method="checkScenario" with="scenario" /> -->
 
 </j:jelly>

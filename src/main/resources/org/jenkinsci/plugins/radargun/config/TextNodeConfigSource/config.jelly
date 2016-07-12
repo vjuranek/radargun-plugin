@@ -2,7 +2,9 @@
     xmlns:f="/lib/form">
 
     <f:entry field="nodes">
-        <f:textarea />
+        <f:textarea checkMethod="post" codemirror-mode="yaml"
+            codemirror-config="mode: 'text/x-yaml', lineNumbers: true, matchBrackets: true, onBlur: function(editor){editor.save()}" />
     </f:entry>
+    <!-- <f:validateButton title="Check syntax" progress="Checking syntax ... " method="checkNodeConfig" with="nodes" /> -->
 
 </j:jelly>
