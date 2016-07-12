@@ -35,10 +35,10 @@ public class Functions {
         msf.setExecutable(true);
     }
     
-    public static void checkDeprecatedConfigs(NodeList nodes, BuildListener listener) {
+    public static void checkDeprecatedConfigs(NodeList nodes, ConsoleLogger console) {
         for (Node node : nodes.asList()) {
             if (node.getJvmOptions() != null) {
-                listener.getLogger().println("Setting up JVM options via RG jenkins plugin is deprecated and will be removed. Please use RG 3 or higher and set up JVM options direcly in RG!");
+                console.logAnnot("[RadarGun] WARN: Setting up JVM options via RG jenkins plugin is deprecated and will be removed. Please use RG 3 or higher and set up JVM options direcly in RG!");
             }
         }
     }

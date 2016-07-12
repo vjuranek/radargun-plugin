@@ -23,6 +23,7 @@ import org.jenkinsci.plugins.radargun.model.impl.MasterShellScript;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.model.impl.SlaveShellScript;
+import org.jenkinsci.plugins.radargun.util.ConsoleLogger;
 import org.jenkinsci.plugins.radargun.util.Functions;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -110,6 +111,7 @@ public class RadarGunBuilder extends Builder {
             throws InterruptedException, IOException {
 
         Resolver.init(build);
+        ConsoleLogger console = new ConsoleLogger(listener);
         
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         build.addAction(new RadarGunInvisibleAction(rgInstall.getHome()));
@@ -118,7 +120,7 @@ public class RadarGunBuilder extends Builder {
         List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
 
         //check deprecated options
-        Functions.checkDeprecatedConfigs(nodes, listener);
+        Functions.checkDeprecatedConfigs(nodes, console);
         
         try {
             // master start script
@@ -144,6 +146,9 @@ public class RadarGunBuilder extends Builder {
             // run all start scripts and wait for completion
             // TODO set build to warning if some
             return runRGNodes(nodeRunners);
+        } catch (Exception e) {
+            console.logAnnot("[RadarGun] ERROR: somethign went wrong, caught exception " + e.getMessage());
+            return false;
         } finally {
             scriptSource.cleanup();
             scenarioSource.cleanup();
