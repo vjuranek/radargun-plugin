@@ -160,7 +160,7 @@ public class RadarGunBuilder extends Builder {
         MasterNode master = nodes.getMaster();
         MasterScriptConfig masterScriptConfig = new MasterShellScript();
         masterScriptConfig.withNumberOfSlaves(nodes.getSlaveCount())
-                .withConfigPath(scenarioSource.getTmpScenarioPath(build)).withMasterHost(master.getFqdn())
+                .withConfigPath(scenarioSource.getTmpScenarioPath(build)).withMasterHost(master.getHostname())
                 .withScriptPath(rgInstall.getExecutable(masterScriptConfig, launcher.getChannel()));
 
         if (pluginPath != null && !pluginPath.isEmpty()) {
@@ -182,7 +182,7 @@ public class RadarGunBuilder extends Builder {
     private String[] getSlaveCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes, int slaveIndex,
             RadarGunInstallation rgInstall) throws InterruptedException, IOException {
         SlaveScriptConfig slaveScriptConfig = new SlaveShellScript();
-        slaveScriptConfig.withSlaveIndex(slaveIndex).withMasterHost(nodes.getMaster().getFqdn())
+        slaveScriptConfig.withSlaveIndex(slaveIndex).withMasterHost(nodes.getMaster().getHostname())
                 .withScriptPath(rgInstall.getExecutable(slaveScriptConfig, launcher.getChannel()));
         
         if (pluginPath != null && !pluginPath.isEmpty()) {
