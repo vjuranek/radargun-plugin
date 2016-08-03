@@ -47,6 +47,7 @@ public class NodeTest {
         assertEquals(" '-server -Xms8g -Xmx8g -XX:+UseLargePages '", node.getAllJavaOpts());
     }
     
+    @Test
     public void testHostname() {
         Node node1  = new Node("test_name", "test_fqdn", null, null, null, null, null);
         assertEquals("test_fqdn", node1.getHostname());
