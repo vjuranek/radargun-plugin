@@ -30,10 +30,11 @@ import org.jenkinsci.plugins.radargun.util.Functions;
 @Deprecated
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
+    public static final String RG_PID_VAR = "RG_PID";
     public static final String CD_CMD = "cd ";
     public static final String JAVA_PROP_PREFIX = "-D";
     public static final String ENV_CMD = "env ";
-    public static final String EXPORT_CMD = "export ";
+    public static final String EXPORT_RG_PID_CMD = " & export " + RG_PID_VAR + " = $!";
     public static final char ENV_KEY_VAL_SEPARATOR = '=';
     public static final char ENV_VAR_QUOTE = '"';
     public static final char VAR_SEPARATOR = ' ';
@@ -65,6 +66,9 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         // And also to gather the log from master
         nodeScriptConfig.withTailFollow().withWait();
         cmd = (String[]) ArrayUtils.addAll(cmd, nodeScriptConfig.getScriptCmd());
+        
+        //export PID of the process we started so that we can kill it if needed
+        cmd = (String[])ArrayUtils.add(cmd, EXPORT_RG_PID_CMD);
         
         //set up user after commands
         cmd = node.getAfterCmds() == null ? cmd : (String[])ArrayUtils.addAll(cmd, Functions.userCmdsToArray(node.getAfterCmds(), CMD_SEPARATOR, true));

@@ -147,7 +147,7 @@ public class RadarGunBuilder extends Builder {
             // TODO set build to warning if some
             return runRGNodes(nodeRunners);
         } catch (Exception e) {
-            console.logAnnot("[RadarGun] ERROR: somethign went wrong, caught exception " + e.getMessage());
+            console.logAnnot("[RadarGun] ERROR: something went wrong, caught exception " + e.getStackTrace());
             return false;
         } finally {
             scriptSource.cleanup();
