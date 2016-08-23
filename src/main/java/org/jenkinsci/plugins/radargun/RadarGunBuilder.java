@@ -1,28 +1,22 @@
 package org.jenkinsci.plugins.radargun;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jenkinsci.plugins.radargun.config.NodeConfigSource;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
-import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
-import org.jenkinsci.plugins.radargun.model.SlaveScriptConfig;
-import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
-import org.jenkinsci.plugins.radargun.model.impl.MasterShellScript;
+import org.jenkinsci.plugins.radargun.model.RgProcess;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
-import org.jenkinsci.plugins.radargun.model.impl.SlaveShellScript;
+import org.jenkinsci.plugins.radargun.model.impl.RgMasterProcessImpl;
+import org.jenkinsci.plugins.radargun.model.impl.RgSlaveProcessImpl;
 import org.jenkinsci.plugins.radargun.util.ConsoleLogger;
 import org.jenkinsci.plugins.radargun.util.Functions;
 import org.jenkinsci.plugins.radargun.util.Resolver;
@@ -33,15 +27,12 @@ import hudson.AbortException;
 import hudson.CopyOnWrite;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Launcher.ProcStarter;
 import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Descriptor;
-import hudson.model.StreamBuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
@@ -117,35 +108,13 @@ public class RadarGunBuilder extends Builder {
         build.addAction(new RadarGunInvisibleAction(rgInstall.getHome()));
 
         NodeList nodes = nodeSource.getNodesList();
-        List<NodeRunner> nodeRunners = new ArrayList<NodeRunner>(nodes.getNodeCount());
 
         //check deprecated options
         Functions.checkDeprecatedConfigs(nodes, console);
         
+        RgBuild rgBuild = new RgBuild(this, build, launcher, nodes, rgInstall);
         try {
-            // master start script
-            RadarGunNodeAction masterAction = new RadarGunNodeAction(build, nodes.getMaster().getName(),
-                    "RadarGun master ");
-            build.addAction(masterAction);
-            String[] masterCmdLine = getMasterCmdLine(build, launcher, nodes, rgInstall);
-            ProcStarter masterProcStarter = buildProcStarter(build, launcher, masterCmdLine, masterAction.getLogFile());
-            nodeRunners.add(new NodeRunner(masterProcStarter, masterAction));
-
-            // slave start scripts
-            List<Node> slaves = nodes.getSlaves();
-            for (int i = 0; i < slaves.size(); i++) {
-                Node slave = slaves.get(i);
-                RadarGunNodeAction slaveAction = new RadarGunNodeAction(build, slave.getName());
-                build.addAction(slaveAction);
-
-                String[] slaveCmdLine = getSlaveCmdLine(build, launcher, nodes, i, rgInstall);
-                ProcStarter slaveProcStarter = buildProcStarter(build, launcher, slaveCmdLine, slaveAction.getLogFile());
-                nodeRunners.add(new NodeRunner(slaveProcStarter, slaveAction));
-            }
-
-            // run all start scripts and wait for completion
-            // TODO set build to warning if some
-            return runRGNodes(nodeRunners);
+            return runRgProcesses(prepareRgProcesses(rgBuild));
         } catch (Exception e) {
             console.logAnnot("[RadarGun] ERROR: something went wrong, caught exception: " + e.getMessage());
             e.printStackTrace(console.getLogger());
@@ -156,79 +125,32 @@ public class RadarGunBuilder extends Builder {
         }
     }
 
-    private String[] getMasterCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes,
-            RadarGunInstallation rgInstall) throws InterruptedException, IOException {
-        MasterNode master = nodes.getMaster();
-        MasterScriptConfig masterScriptConfig = new MasterShellScript();
-        masterScriptConfig.withNumberOfSlaves(nodes.getSlaveCount())
-                .withConfigPath(scenarioSource.getTmpScenarioPath(build)).withMasterHost(master.getHostname())
-                .withScriptPath(rgInstall.getExecutable(masterScriptConfig, launcher.getChannel()));
-
-        if (pluginPath != null && !pluginPath.isEmpty()) {
-            masterScriptConfig.withPlugin(pluginPath);
-            if (pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
-                masterScriptConfig.withPluginConfig(pluginConfigPath);
-            }
-        }
-        if (reporterPath != null && !reporterPath.isEmpty())
-            masterScriptConfig.withReporter(reporterPath);
-
-        String javaOpts = Resolver.buildVar(build, master.getAllJavaOpts());
-        masterScriptConfig.withJavaOpts(javaOpts);
-        
-        String[] masterCmdLine = scriptSource.getMasterCmdLine(build.getWorkspace(), master, masterScriptConfig);
-        return masterCmdLine;
+    private List<RgProcess> prepareRgProcesses(RgBuild rgBuild) {
+        List<RgProcess> rgProcesses = new ArrayList<RgProcess>(rgBuild.getNodes().getNodeCount());
+        rgProcesses.add(new RgMasterProcessImpl(rgBuild));
+        List<Node> slaves = rgBuild.getNodes().getSlaves();
+        for (int i = 0; i < slaves.size(); i++) {
+            rgProcesses.add(new RgSlaveProcessImpl(rgBuild, i));
+        } 
+        return rgProcesses;
     }
+    
+    private boolean runRgProcesses(List<RgProcess> rgProcesses) throws AbortException {
+        ExecutorService executorService = Executors.newFixedThreadPool(rgProcesses.size());
 
-    private String[] getSlaveCmdLine(AbstractBuild<?, ?> build, Launcher launcher, NodeList nodes, int slaveIndex,
-            RadarGunInstallation rgInstall) throws InterruptedException, IOException {
-        SlaveScriptConfig slaveScriptConfig = new SlaveShellScript();
-        slaveScriptConfig.withSlaveIndex(slaveIndex).withMasterHost(nodes.getMaster().getHostname())
-                .withScriptPath(rgInstall.getExecutable(slaveScriptConfig, launcher.getChannel()));
-        
-        if (pluginPath != null && !pluginPath.isEmpty()) {
-            slaveScriptConfig.withPlugin(pluginPath);
-            if (pluginConfigPath != null && !pluginConfigPath.isEmpty()) {
-                slaveScriptConfig.withPluginConfig(pluginConfigPath);
-            }
+        // start processes
+        for (RgProcess process : rgProcesses) {
+            process.start(executorService);
         }
 
-        Node slave = nodes.getSlaves().get(slaveIndex);
-        String javaOpts = Resolver.buildVar(build, slave.getAllJavaOpts());
-        slaveScriptConfig.withJavaOpts(javaOpts);
-        
-        String[] slaveCmdLine = scriptSource.getSlaveCmdLine(build.getWorkspace(), slave, slaveScriptConfig);
-        return slaveCmdLine;
-
-    }
-
-    private boolean runRGNodes(List<NodeRunner> nodeRunners) throws AbortException {
-        int nodeCount = nodeRunners.size();
-        CountDownLatch latch = new CountDownLatch(nodeCount);
-        ExecutorService executorService = Executors.newFixedThreadPool(nodeCount);
-
-        // submit runners
-        List<Future<Integer>> nodeRetCodes = new ArrayList<Future<Integer>>(nodeCount);
-        for (NodeRunner runner : nodeRunners) {
-            //runner.setLatch(latch);
-            nodeRetCodes.add(executorService.submit(runner));
-        }
-
-        boolean isSuccess = true;
-        // wait for processes to be finished
+        boolean isSuccess = false;
         try {
-            //latch.await();
-            isSuccess = nodeRetCodes.get(0).get() == 0;
-            //TODO change to warning if some of slaves processes fail?
-            /*for (Future<Integer> retCode : nodeRetCodes) {
-                if (retCode.get() != 0) {
-                    isSuccess = false;
-                    break;
-                }
-            }*/
+            // wait for master process to be finished, failure of the slave process should be detected by RG master
+            isSuccess = rgProcesses.get(0).waitForResult() == 0;
         } catch (InterruptedException e) {
-            LOGGER.log(Level.INFO, "Failing the build - build interrupted", e);
-            throw new AbortException(e.getMessage());
+            //TODO actually shouln't fail the build but set it to canceled
+            LOGGER.log(Level.INFO, "Stopping the build - build interrupted", e);
+            //throw new AbortException(e.getMessage());
         } catch (ExecutionException e) {
             LOGGER.log(Level.INFO, "Failing the build - getting master result has failed", e);
             throw new AbortException(e.getMessage());
@@ -238,24 +160,6 @@ public class RadarGunBuilder extends Builder {
         }
 
         return isSuccess;
-    }
-
-    private ProcStarter buildProcStarter(AbstractBuild<?, ?> build, Launcher launcher, String[] cmdLine, File log)
-            throws IOException, InterruptedException {
-        FilePath workspace = getProcWorkspace(build);
-        BuildListener logListener = new StreamBuildListener(log, Charset.defaultCharset());
-        ProcStarter procStarter = launcher.launch().cmds(cmdLine).envs(build.getEnvironment(logListener))
-                .pwd(workspace).stdout(logListener);
-        return procStarter;
-    }
-    
-    private FilePath getProcWorkspace(AbstractBuild<?, ?> build) throws IOException, InterruptedException {
-        FilePath workspace = workspacePath == null ? build.getWorkspace() : build.getBuiltOn().createPath(Resolver.buildVar(
-                build, workspacePath));
-        if (!workspace.exists()) {
-            throw new IOException(String.format("Workspace path '%s' doesn't exists! Check your job configuration!", workspace.getRemote()));
-        }
-        return workspace;
     }
 
     @Override
