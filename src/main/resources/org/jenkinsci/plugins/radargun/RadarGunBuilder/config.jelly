@@ -27,6 +27,10 @@
         </j:forEach>
     </f:dropdownList>
 
+    <f:entry title="Remote login program">
+        <f:select field="remoteLoginProgram" />
+    </f:entry>
+
     <j:set var="currScript" value="${instance.scriptSource}" />
     <f:dropdownList name="scriptSource" title="Start script"
         description="Script which will be used for staring appropriate processes on nodes">
@@ -40,6 +44,10 @@
     </f:dropdownList>
 
     <f:advanced>
+        <f:entry title="Remote login" field="remoteLogin" description="Login name to be used for remote connection to RG nodes">
+            <f:textbox />
+        </f:entry>
+    
         <f:entry title="Workspace path" field="workspacePath" description="Path to working directory on master and slaves">
             <f:textbox />
         </f:entry>

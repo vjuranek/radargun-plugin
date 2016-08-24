@@ -30,7 +30,6 @@ import org.jenkinsci.plugins.radargun.util.Functions;
 @Deprecated
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
-    public static final String RG_PID_VAR = "RG_PID";
     public static final String CD_CMD = "cd ";
     public static final String JAVA_PROP_PREFIX = "-D";
     public static final String ENV_CMD = "env ";

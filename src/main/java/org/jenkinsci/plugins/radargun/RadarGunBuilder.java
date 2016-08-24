@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import org.jenkinsci.plugins.radargun.config.NodeConfigSource;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
+import org.jenkinsci.plugins.radargun.model.RgMasterProcess;
 import org.jenkinsci.plugins.radargun.model.RgProcess;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
@@ -46,6 +47,8 @@ public class RadarGunBuilder extends Builder {
     private final ScenarioSource scenarioSource;
     private final NodeConfigSource nodeSource;
     private final ScriptSource scriptSource;
+    private String remoteLoginProgram; //cannot be final as we re-assign it in readResolve() it it's null for backward compatibility reasons
+    private final String remoteLogin;
     private final String workspacePath;
     private final String pluginPath;
     private final String pluginConfigPath;
@@ -53,16 +56,28 @@ public class RadarGunBuilder extends Builder {
 
     @DataBoundConstructor
     public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeConfigSource nodeSource,
-            ScriptSource scriptSource, String workspacePath, String pluginPath, String pluginConfigPath,
+            ScriptSource scriptSource, String remoteLoginProgram, String remoteLogin, String workspacePath, String pluginPath, String pluginConfigPath,
             String reporterPath) {
         this.radarGunName = radarGunName;
         this.scenarioSource = scenarioSource;
         this.nodeSource = nodeSource;
         this.scriptSource = scriptSource;
+        this.remoteLoginProgram = remoteLoginProgram;
+        this.remoteLogin = remoteLogin;
         this.workspacePath = Util.fixEmpty(workspacePath);
         this.pluginPath = pluginPath;
         this.pluginConfigPath = pluginConfigPath;
         this.reporterPath = reporterPath;
+    }
+    
+    /**
+     * For keeping backward compatibility defaults in ssh as a remote login program
+     */
+    public RadarGunBuilder readResolve() {
+        if (this.remoteLoginProgram == null) {
+            this.remoteLoginProgram = RemoteLoginProgram.SSH.getName().toUpperCase();
+        }
+        return this;
     }
 
     public String getRadarGunName() {
@@ -80,7 +95,15 @@ public class RadarGunBuilder extends Builder {
     public ScriptSource getScriptSource() {
         return scriptSource;
     }
+    
+    public String getRemoteLoginProgram() {
+        return remoteLoginProgram;
+    }
 
+    public String getRemoteLogin() {
+        return remoteLogin;
+    }
+    
     public String getWorkspacePath() {
         return workspacePath;
     }
@@ -113,15 +136,21 @@ public class RadarGunBuilder extends Builder {
         Functions.checkDeprecatedConfigs(nodes, console);
         
         RgBuild rgBuild = new RgBuild(this, build, launcher, nodes, rgInstall);
+        List<RgProcess> rgProcesses = null;
+        ExecutorService executorService = null;
         try {
-            return runRgProcesses(prepareRgProcesses(rgBuild));
+            rgProcesses = prepareRgProcesses(rgBuild);
+            executorService = Executors.newFixedThreadPool(rgProcesses.size());
+            for (RgProcess process : rgProcesses) {
+                process.start(executorService);
+            }
+            return waitForRgMaster(rgProcesses.get(0));
         } catch (Exception e) {
             console.logAnnot("[RadarGun] ERROR: something went wrong, caught exception: " + e.getMessage());
             e.printStackTrace(console.getLogger());
             return false;
         } finally {
-            scriptSource.cleanup();
-            scenarioSource.cleanup();
+            cleanup(rgProcesses, executorService);
         }
     }
 
@@ -135,18 +164,11 @@ public class RadarGunBuilder extends Builder {
         return rgProcesses;
     }
     
-    private boolean runRgProcesses(List<RgProcess> rgProcesses) throws AbortException {
-        ExecutorService executorService = Executors.newFixedThreadPool(rgProcesses.size());
-
-        // start processes
-        for (RgProcess process : rgProcesses) {
-            process.start(executorService);
-        }
-
+    private boolean waitForRgMaster(RgProcess masterProc) throws AbortException {
         boolean isSuccess = false;
         try {
             // wait for master process to be finished, failure of the slave process should be detected by RG master
-            isSuccess = rgProcesses.get(0).waitForResult() == 0;
+            isSuccess = masterProc.waitForResult() == 0;
         } catch (InterruptedException e) {
             //TODO actually shouln't fail the build but set it to canceled
             LOGGER.log(Level.INFO, "Stopping the build - build interrupted", e);
@@ -154,12 +176,30 @@ public class RadarGunBuilder extends Builder {
         } catch (ExecutionException e) {
             LOGGER.log(Level.INFO, "Failing the build - getting master result has failed", e);
             throw new AbortException(e.getMessage());
-        } finally {
+        } 
+        return isSuccess;
+    }
+    
+    private void cleanup(List<RgProcess> rgProcesses, ExecutorService executorService) {
+        if (executorService != null) {
             List<Runnable> notStarted = executorService.shutdownNow();
             LOGGER.log(Level.FINE, "Number of tasks that weren't started: " + notStarted.size());
         }
-
-        return isSuccess;
+        
+        try {
+            scriptSource.cleanup();
+            scenarioSource.cleanup();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Removing temporal files failed", e);
+        }
+        
+        if (rgProcesses != null) {
+            try {
+                ((RgMasterProcess)rgProcesses.get(0)).kill();
+            } catch(Exception e) {
+                LOGGER.log(Level.WARNING, "Killing RG master failed", e);
+            }
+        }
     }
 
     @Override
@@ -231,6 +271,14 @@ public class RadarGunBuilder extends Builder {
             return NodeConfigSource.all();
         }
 
+        public static ListBoxModel doFillRemoteLoginProgramItems() {
+            ListBoxModel lb = new ListBoxModel();
+            for (RemoteLoginProgram remote : RemoteLoginProgram.values()) {
+                lb.add(remote.getName(), remote.getName().toUpperCase());
+            }
+            return lb;
+        }
+        
         public static DescriptorExtensionList<ScriptSource, Descriptor<ScriptSource>> getScriptSources() {
             return ScriptSource.all();
         }

@@ -6,13 +6,13 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.jenkinsci.plugins.radargun.RemoteLoginProgram;
 import org.jenkinsci.plugins.radargun.RgBuild;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 
 import hudson.FilePath;
 import hudson.Launcher.ProcStarter;
-import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.StreamBuildListener;
 
@@ -61,19 +61,29 @@ public class Functions {
     
     public static ProcStarter buildProcStarter(RgBuild rgBuild, String[] cmdLine, File log)
             throws IOException, InterruptedException {
-        FilePath workspace = getProcWorkspace(rgBuild.getBuild(), rgBuild.getRgBuilder().getWorkspacePath());
+        FilePath workspace = getRemoteWorkspace(rgBuild);
         BuildListener logListener = new StreamBuildListener(log, Charset.defaultCharset());
         ProcStarter procStarter = rgBuild.getLauncher().launch().cmds(cmdLine).envs(rgBuild.getBuild().getEnvironment(logListener))
                 .pwd(workspace).stdout(logListener);
         return procStarter;
     }
     
-    public static FilePath getProcWorkspace(AbstractBuild<?, ?> build, String workspacePath) throws IOException, InterruptedException {
-        FilePath workspace = workspacePath == null ? build.getWorkspace() : build.getBuiltOn().createPath(Resolver.buildVar(
-                build, workspacePath));
+    public static FilePath getRemoteWorkspace(RgBuild rgBuild) throws IOException, InterruptedException {
+        String wsPath = rgBuild.getRgBuilder().getWorkspacePath();
+        FilePath workspace = wsPath == null ? 
+                rgBuild.getBuild().getWorkspace()
+                : rgBuild.getBuild().getBuiltOn().createPath(Resolver.buildVar(rgBuild.getBuild(), wsPath));
         if (!workspace.exists()) {
             throw new IOException(String.format("Workspace path '%s' doesn't exists! Check your job configuration!", workspace.getRemote()));
         }
         return workspace;
+    }
+    
+    public static String[] buildRemoteCmd(RgBuild rgBuild, String nodeHostname, String[] localCmd) {
+        String[] remoteLoginCmd = RemoteLoginProgram.valueOf(rgBuild.getRgBuilder().getRemoteLoginProgram()).getCmd();
+        String remoteLogin = rgBuild.getRgBuilder().getRemoteLogin() == null ? "" : rgBuild.getRgBuilder().getRemoteLogin() + "@";
+        remoteLoginCmd = (String[]) ArrayUtils.addAll(remoteLoginCmd, new String[] {remoteLogin + nodeHostname});
+        String[] cmd = (String[]) ArrayUtils.addAll(remoteLoginCmd, localCmd);
+        return cmd;
     }
 }
