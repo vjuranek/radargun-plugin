@@ -15,6 +15,7 @@ import org.jenkinsci.plugins.radargun.config.NodeConfigParser;
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
+import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.yaml.snakeyaml.Yaml;
 
@@ -98,8 +99,8 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         Map<String, String> javaProps = nodeConfig.containsKey(JAVA_PROPS_KEY) ? (Map<String, String>) nodeConfig
                 .get(JAVA_PROPS_KEY) : null;
         @SuppressWarnings("unchecked")
-        Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? (Map<String, String>) nodeConfig
-                .get(ENV_VARS_KEY) : null;
+        Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? ParseUtils.mapToStringMap(nodeConfig
+                .get(ENV_VARS_KEY)) : null;
         @SuppressWarnings("unchecked")
         List<String> beforeCmds = nodeConfig.containsKey(BEFORE_CMDS) ? (List<String>) nodeConfig.get(BEFORE_CMDS) : null;
         @SuppressWarnings("unchecked")

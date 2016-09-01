@@ -47,7 +47,7 @@ public abstract class RgShellScript implements RgScriptConfig {
         StringBuilder sb = new StringBuilder();
         for(String s : getScriptCmd()) {
             sb.append(s);
-            sb.append(" ");
+            sb.append(' ');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
