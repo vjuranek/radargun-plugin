@@ -51,7 +51,7 @@ public class RgSlaveProcessImpl extends AbstractRgProcess implements RgSlaveProc
         String javaOpts = Resolver.buildVar(rgBuild.getBuild(), slave.getAllJavaOpts());
         slaveScriptConfig.withJavaOpts(javaOpts);
         
-        String[] slaveCmdLine = rgBuild.getRgBuilder().getScriptSource().getSlaveCmdLine(rgBuild.getBuild().getWorkspace(), slave, slaveScriptConfig);
+        String[] slaveCmdLine = rgBuild.getRgBuilder().getScriptSource().getSlaveCmdLine(Functions.getRemoteWorkspace(rgBuild), slave, slaveScriptConfig);
         return slaveCmdLine;
     }
 
