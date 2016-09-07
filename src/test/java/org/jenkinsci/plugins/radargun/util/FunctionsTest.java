@@ -7,6 +7,9 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jenkinsci.plugins.radargun.RadarGunBuilder;
+import org.jenkinsci.plugins.radargun.RemoteLoginProgram;
+import org.jenkinsci.plugins.radargun.RgBuild;
 import org.junit.Test;
 
 import hudson.FilePath;
@@ -69,6 +72,21 @@ public class FunctionsTest {
        assertEquals("ls", cmds[6]);
        assertEquals("-la", cmds[7]);
        assertEquals("/tmp", cmds[8]);
+    }
+    
+    @Test
+    public void testBuildRemoteCmd() {
+        RadarGunBuilder sshBuilder = new RadarGunBuilder("testRGBuilder", null, null, null, "SSH", "  ", null, null, null, null);
+        RgBuild rgBuild = new RgBuild(sshBuilder, null, null, null, null);
+        String[] remoteSshCmd = Functions.buildRemoteCmd(rgBuild, "127.0.0.1", new String[] {"echo", "'test'"});
+        
+        String[] sshCmds = RemoteLoginProgram.SSH.getCmd();
+        for (int i = 0; i < sshCmds.length; i++) {
+            assertEquals(sshCmds[i], remoteSshCmd[i]);
+        }
+        assertEquals("127.0.0.1", remoteSshCmd[sshCmds.length]);
+        assertEquals("echo", remoteSshCmd[sshCmds.length + 1]);
+        assertEquals("'test'", remoteSshCmd[sshCmds.length + 2]);
     }
 
 }

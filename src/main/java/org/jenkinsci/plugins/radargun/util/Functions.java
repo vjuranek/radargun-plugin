@@ -81,7 +81,8 @@ public class Functions {
     
     public static String[] buildRemoteCmd(RgBuild rgBuild, String nodeHostname, String[] localCmd) {
         String[] remoteLoginCmd = RemoteLoginProgram.valueOf(rgBuild.getRgBuilder().getRemoteLoginProgram()).getCmd();
-        String remoteLogin = rgBuild.getRgBuilder().getRemoteLogin() == null ? "" : rgBuild.getRgBuilder().getRemoteLogin() + "@";
+        String remoteLoginCfg = rgBuild.getRgBuilder().getRemoteLogin();
+        String remoteLogin = (remoteLoginCfg == null || remoteLoginCfg.trim().isEmpty()) ? "" : rgBuild.getRgBuilder().getRemoteLogin() + "@";
         remoteLoginCmd = (String[]) ArrayUtils.addAll(remoteLoginCmd, new String[] {remoteLogin + nodeHostname});
         String[] cmd = (String[]) ArrayUtils.addAll(remoteLoginCmd, localCmd);
         return cmd;
