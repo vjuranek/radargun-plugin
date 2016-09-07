@@ -88,5 +88,19 @@ public class FunctionsTest {
         assertEquals("echo", remoteSshCmd[sshCmds.length + 1]);
         assertEquals("'test'", remoteSshCmd[sshCmds.length + 2]);
     }
+    
+    @Test
+    public void testIsNullOrEmpty() {
+        String str1 = null;
+        String str2 = "";
+        String str3 = " ";
+        String str4 = " ";
+        String str5 = " a";
+        assertTrue(Functions.isNullOrEmpty(str1));
+        assertTrue(Functions.isNullOrEmpty(str2));
+        assertTrue(Functions.isNullOrEmpty(str3));
+        assertTrue(Functions.isNullOrEmpty(str4));
+        assertTrue(!Functions.isNullOrEmpty(str5));
+    }
 
 }

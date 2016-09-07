@@ -70,7 +70,7 @@ public class Functions {
     
     public static FilePath getRemoteWorkspace(RgBuild rgBuild) throws IOException, InterruptedException {
         String wsPath = rgBuild.getRgBuilder().getWorkspacePath();
-        FilePath workspace = wsPath == null ? 
+        FilePath workspace = isNullOrEmpty(wsPath) ? 
                 rgBuild.getBuild().getWorkspace()
                 : rgBuild.getBuild().getBuiltOn().createPath(Resolver.buildVar(rgBuild.getBuild(), wsPath));
         if (!workspace.exists()) {
@@ -82,9 +82,13 @@ public class Functions {
     public static String[] buildRemoteCmd(RgBuild rgBuild, String nodeHostname, String[] localCmd) {
         String[] remoteLoginCmd = RemoteLoginProgram.valueOf(rgBuild.getRgBuilder().getRemoteLoginProgram()).getCmd();
         String remoteLoginCfg = rgBuild.getRgBuilder().getRemoteLogin();
-        String remoteLogin = (remoteLoginCfg == null || remoteLoginCfg.trim().isEmpty()) ? "" : rgBuild.getRgBuilder().getRemoteLogin() + "@";
+        String remoteLogin = isNullOrEmpty(remoteLoginCfg) ? "" : rgBuild.getRgBuilder().getRemoteLogin() + "@";
         remoteLoginCmd = (String[]) ArrayUtils.addAll(remoteLoginCmd, new String[] {remoteLogin + nodeHostname});
         String[] cmd = (String[]) ArrayUtils.addAll(remoteLoginCmd, localCmd);
         return cmd;
+    }
+    
+    public static boolean isNullOrEmpty(String str) {
+        return ((str == null) || (str.trim().isEmpty()));
     }
 }
