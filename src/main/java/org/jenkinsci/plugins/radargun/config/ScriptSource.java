@@ -1,22 +1,22 @@
 package org.jenkinsci.plugins.radargun.config;
 
-import hudson.DescriptorExtensionList;
-import hudson.FilePath;
-import hudson.model.Describable;
-import hudson.model.Descriptor;
-
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-import jenkins.model.Jenkins;
-
 import org.apache.commons.lang.ArrayUtils;
+import org.jenkinsci.plugins.radargun.RgBuild;
 import org.jenkinsci.plugins.radargun.model.MasterScriptConfig;
 import org.jenkinsci.plugins.radargun.model.NodeScriptConfig;
 import org.jenkinsci.plugins.radargun.model.SlaveScriptConfig;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.util.Functions;
+
+import hudson.DescriptorExtensionList;
+import hudson.FilePath;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
+import jenkins.model.Jenkins;
 
 /**
  * Init scripts used for launching RG on remote nodes, typically via ssh. This seems to be redundant and will be removed
@@ -31,8 +31,10 @@ import org.jenkinsci.plugins.radargun.util.Functions;
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
     public static final String CD_CMD = "cd ";
-    public static final String JAVA_PROP_PREFIX = "-D";
     public static final String ENV_CMD = "env ";
+    public static final String EXPORT_CMD = "export ";
+    public static final String RG_SUFFIX_ENV_VAR = "RG_LOG_ID";
+    public static final String JAVA_PROP_PREFIX = "-D";
     public static final char ENV_KEY_VAL_SEPARATOR = '=';
     public static final char ENV_VAR_QUOTE = '"';
     public static final char VAR_SEPARATOR = ' ';
@@ -44,12 +46,13 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
 
     public abstract void cleanup() throws InterruptedException, IOException;
 
-    public String[] getNodeCmdLine(String nodeScriptPath, Node node, NodeScriptConfig nodeScriptConfig, String workspace)
+    /*package*/ String[] getNodeCmdLine(String nodeScriptPath, Node node, NodeScriptConfig nodeScriptConfig, String workspace, int buildId)
             throws InterruptedException, IOException {
         Functions.makeExecutable(nodeScriptPath);
         //path to init script (typically ssh) and hostname of the machine where subsequent commands should be executed
         //also changes pwd to workspace 
-        String[] cmd = new String[] { nodeScriptPath, node.getHostname(), CD_CMD, workspace + CMD_SEPARATOR  };
+        //and export RG_LOG_ID env. var. to adjust RG log suffix to Jenkins build ID
+        String[] cmd = new String[] { nodeScriptPath, node.getHostname(), CD_CMD, workspace + CMD_SEPARATOR, EXPORT_CMD + RG_SUFFIX_ENV_VAR + ENV_KEY_VAL_SEPARATOR + String.valueOf(buildId) + CMD_SEPARATOR };
         
         //set up user init commands
         cmd = node.getBeforeCmds() == null ? cmd : (String[])ArrayUtils.addAll(cmd, Functions.userCmdsToArray(node.getBeforeCmds(), CMD_SEPARATOR, false));
@@ -70,16 +73,17 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         return cmd;
     }
 
-    public String[] getMasterCmdLine(FilePath workspace, Node node, MasterScriptConfig nodeScriptConfig)
-            throws InterruptedException, IOException {
+    public String[] getMasterCmdLine(RgBuild rgBuild, MasterScriptConfig masterScriptConfig) throws InterruptedException, IOException {
+        FilePath workspace = Functions.getRemoteWorkspace(rgBuild);
         String masterScriptPath = getMasterScriptPath(workspace);
-        return getNodeCmdLine(masterScriptPath, node, nodeScriptConfig, workspace.getRemote());
+        return getNodeCmdLine(masterScriptPath, rgBuild.getNodes().getMaster(), masterScriptConfig, workspace.getRemote(), rgBuild.getBuild().getNumber());
     }
 
-    public String[] getSlaveCmdLine(FilePath workspace, Node node, SlaveScriptConfig nodeScriptConfig)
+    public String[] getSlaveCmdLine(int slaveId, RgBuild rgBuild, SlaveScriptConfig nodeScriptConfig)
             throws InterruptedException, IOException {
+        FilePath workspace = Functions.getRemoteWorkspace(rgBuild);
         String slaveScriptPath = getSlaveScriptPath(workspace);
-        return getNodeCmdLine(slaveScriptPath, node, nodeScriptConfig, workspace.getRemote());
+        return getNodeCmdLine(slaveScriptPath, rgBuild.getNodes().getSlaves().get(slaveId), nodeScriptConfig, workspace.getRemote(), rgBuild.getBuild().getNumber());
     }
 
     /**
@@ -94,9 +98,9 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         Iterator<String> envIter = envVars.keySet().iterator();
         while (envIter.hasNext()) {
             String key = envIter.next();
-            String value = envVars.get(key) instanceof String ? envVars.get(key) : envVars.get(key).toString(); 
-            sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE).append(value)
-                    .append(ENV_VAR_QUOTE).append(VAR_SEPARATOR);
+            String value = envVars.get(key) instanceof String ? envVars.get(key) : envVars.get(key).toString();
+            sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE).append(value).append(ENV_VAR_QUOTE)
+                    .append(VAR_SEPARATOR);
         }
         return sb.toString();
     }

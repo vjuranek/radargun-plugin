@@ -63,8 +63,7 @@ public class RgMasterProcessImpl extends AbstractRgProcess implements RgMasterPr
         String javaOpts = Resolver.buildVar(rgBuild.getBuild(), master.getAllJavaOpts());
         masterScriptConfig.withJavaOpts(javaOpts);
 
-        String[] masterCmdLine = rgBuild.getRgBuilder().getScriptSource()
-                .getMasterCmdLine(Functions.getRemoteWorkspace(rgBuild), master, masterScriptConfig);
+        String[] masterCmdLine = rgBuild.getRgBuilder().getScriptSource().getMasterCmdLine(rgBuild, masterScriptConfig);
         return masterCmdLine;
     }
 
