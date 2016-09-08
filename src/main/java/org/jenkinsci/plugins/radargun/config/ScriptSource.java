@@ -54,7 +54,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         //set up user init commands
         cmd = node.getBeforeCmds() == null ? cmd : (String[])ArrayUtils.addAll(cmd, Functions.userCmdsToArray(node.getBeforeCmds(), CMD_SEPARATOR, false));
         
-        //eventually setup environment whehe RG scripts should be executed
+        //eventually setup environment where RG scripts should be executed
         //env cmd takes as a parameter command which needs to be executed in given env, so this needs to be right before RG script is added 
         //into cmd array
         cmd = node.getEnvVars() == null ? cmd : (String[]) ArrayUtils.addAll(cmd, new String[] { ENV_CMD, prepareEnvVars(node.getEnvVars()) });
@@ -94,10 +94,6 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         Iterator<String> envIter = envVars.keySet().iterator();
         while (envIter.hasNext()) {
             String key = envIter.next();
-            System.out.println("KEY:" + key);
-            System.out.println("key class" + key.getClass().getName());
-            System.out.println(envVars.get(key).getClass().getName());
-            System.out.println("VALUE: " + (envVars.get(key)).toString());
             String value = envVars.get(key) instanceof String ? envVars.get(key) : envVars.get(key).toString(); 
             sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE).append(value)
                     .append(ENV_VAR_QUOTE).append(VAR_SEPARATOR);
