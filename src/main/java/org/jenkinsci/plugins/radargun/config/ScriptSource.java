@@ -29,9 +29,9 @@ import jenkins.model.Jenkins;
  */
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
-    public static final String CD_CMD = "cd ";
-    public static final String ENV_CMD = "env ";
-    public static final String EXPORT_CMD = "export ";
+    public static final String CD_CMD = "cd";
+    public static final String ENV_CMD = "env";
+    public static final String EXPORT_CMD = "export";
     public static final String RG_SUFFIX_ENV_VAR = "RG_LOG_ID";
     public static final String JAVA_PROP_PREFIX = "-D";
     public static final char ENV_KEY_VAL_SEPARATOR = '=';
@@ -51,7 +51,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         //path to init script (typically ssh) and hostname of the machine where subsequent commands should be executed
         //also changes pwd to workspace 
         //and export RG_LOG_ID env. var. to adjust RG log suffix to Jenkins build ID
-        String[] cmd = new String[] { nodeScriptPath, node.getHostname(), CD_CMD, workspace + CMD_SEPARATOR, EXPORT_CMD + RG_SUFFIX_ENV_VAR + ENV_KEY_VAL_SEPARATOR + String.valueOf(buildId) + CMD_SEPARATOR };
+        String[] cmd = new String[] { nodeScriptPath, node.getHostname(), CD_CMD, workspace + CMD_SEPARATOR, EXPORT_CMD, RG_SUFFIX_ENV_VAR + ENV_KEY_VAL_SEPARATOR + String.valueOf(buildId) + CMD_SEPARATOR };
         
         //set up user init commands
         cmd = node.getBeforeCmds() == null ? cmd : (String[])ArrayUtils.addAll(cmd, Functions.userCmdsToArray(node.getBeforeCmds(), CMD_SEPARATOR, false));
@@ -92,7 +92,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
      *            not to be null.
      * @return string representation env. variables separated by semicolon
      */
-    private String prepareEnvVars(Map<String, String> envVars) {
+    /*package*/ String prepareEnvVars(Map<String, String> envVars) {
         StringBuilder sb = new StringBuilder();
         Iterator<String> envIter = envVars.keySet().iterator();
         while (envIter.hasNext()) {
@@ -101,7 +101,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
             sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE).append(value).append(ENV_VAR_QUOTE)
                     .append(VAR_SEPARATOR);
         }
-        return sb.toString();
+        return sb.subSequence(0, sb.length() - 1).toString();
     }
 
     @Override
