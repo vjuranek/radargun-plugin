@@ -20,14 +20,13 @@ import jenkins.model.Jenkins;
 
 /**
  * Init scripts used for launching RG on remote nodes, typically via ssh. This seems to be redundant and will be removed
- * soon.
+ * soon - actually probably only removed as it contains important stuff like construcing cmd line.
  * 
  * TODO replace by more convenient construct or script should be completely generated based on used configuration.
  * 
  * @author vjuranek
  * 
  */
-@Deprecated
 public abstract class ScriptSource implements Describable<ScriptSource> {
 
     public static final String CD_CMD = "cd ";
