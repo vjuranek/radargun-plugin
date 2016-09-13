@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.radargun.util;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -59,10 +60,10 @@ public class Functions {
         return cmds;
     }
     
-    public static ProcStarter buildProcStarter(RgBuild rgBuild, String[] cmdLine, File log)
+    public static ProcStarter buildProcStarter(RgBuild rgBuild, String[] cmdLine, FileOutputStream logStream)
             throws IOException, InterruptedException {
         FilePath workspace = getRemoteWorkspace(rgBuild);
-        BuildListener logListener = new StreamBuildListener(log, Charset.defaultCharset());
+        BuildListener logListener = new StreamBuildListener(logStream, Charset.defaultCharset());
         ProcStarter procStarter = rgBuild.getLauncher().launch().cmds(cmdLine).envs(rgBuild.getBuild().getEnvironment(logListener))
                 .pwd(workspace).stdout(logListener);
         return procStarter;

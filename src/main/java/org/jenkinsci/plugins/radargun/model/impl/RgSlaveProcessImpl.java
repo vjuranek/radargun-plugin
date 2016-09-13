@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.radargun.model.impl;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.jenkinsci.plugins.radargun.NodeRunner;
@@ -29,7 +30,7 @@ public class RgSlaveProcessImpl extends AbstractRgProcess implements RgSlaveProc
         rgBuild.getBuild().addAction(slaveAction);
 
         String[] slaveCmdLine = getSlaveCmdLine();
-        ProcStarter slaveProcStarter = Functions.buildProcStarter(rgBuild, slaveCmdLine, slaveAction.getLogFile());
+        ProcStarter slaveProcStarter = Functions.buildProcStarter(rgBuild, slaveCmdLine, new FileOutputStream(slaveAction.getLogFile()));
         return new NodeRunner(slaveProcStarter, slaveAction);
     }
 

@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.radargun.model.impl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +37,7 @@ public class RgMasterProcessImpl extends AbstractRgProcess implements RgMasterPr
                 "RadarGun master ");
         rgBuild.getBuild().addAction(masterAction);
         String[] masterCmdLine = getMasterCmdLine();
-        ProcStarter masterProcStarter = Functions.buildProcStarter(rgBuild, masterCmdLine, masterAction.getLogFile());
+        ProcStarter masterProcStarter = Functions.buildProcStarter(rgBuild, masterCmdLine, new FileOutputStream(masterAction.getLogFile()));
         return new NodeRunner(masterProcStarter, masterAction);
     }
 
@@ -89,7 +90,7 @@ public class RgMasterProcessImpl extends AbstractRgProcess implements RgMasterPr
         
         String[] cmd = Functions.buildRemoteCmd(rgBuild, rgBuild.getNodes().getMaster().getHostname(),
                 new String[] { "/usr/bin/kill", "-9", pid.toString() });
-        ProcStarter killPidProc = Functions.buildProcStarter(rgBuild, cmd, masterAction.getLogFile());
+        ProcStarter killPidProc = Functions.buildProcStarter(rgBuild, cmd, new FileOutputStream(masterAction.getLogFile(), true));
         killPidProc.start();
         return killPidProc.join() == 0;
     }
@@ -100,7 +101,7 @@ public class RgMasterProcessImpl extends AbstractRgProcess implements RgMasterPr
         // check if RG master.pid file exists and eventually wait for it to be created
         String[] cmd = Functions.buildRemoteCmd(rgBuild, rgBuild.getNodes().getMaster().getHostname(),
                 new String[] { "/usr/bin/test", "-f", workspace + "/master.pid" });
-        ProcStarter masterPidFileProc = Functions.buildProcStarter(rgBuild, cmd, masterAction.getLogFile());
+        ProcStarter masterPidFileProc = Functions.buildProcStarter(rgBuild, cmd, new FileOutputStream(masterAction.getLogFile(), true));
         int retCode = 1;
         int retries = 0;
         do {
@@ -118,7 +119,7 @@ public class RgMasterProcessImpl extends AbstractRgProcess implements RgMasterPr
         // master.pid exists, read the file content
         cmd = Functions.buildRemoteCmd(rgBuild, rgBuild.getNodes().getMaster().getHostname(),
                 new String[] { "/usr/bin/cat", workspace + "/master.pid" });
-        ProcStarter masterPidProc = Functions.buildProcStarter(rgBuild, cmd, masterAction.getLogFile());
+        ProcStarter masterPidProc = Functions.buildProcStarter(rgBuild, cmd, new FileOutputStream(masterAction.getLogFile(), true));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         masterPidProc.stdout(baos);
         retCode = masterPidProc.join();
