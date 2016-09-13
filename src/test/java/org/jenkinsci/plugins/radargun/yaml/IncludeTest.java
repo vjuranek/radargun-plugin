@@ -20,7 +20,7 @@ import org.jenkinsci.plugins.radargun.config.NodeConfigParser;
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
-import org.jenkinsci.plugins.radargun.util.IOUtils;
+import org.jenkinsci.plugins.radargun.testutil.IOUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.junit.BeforeClass;
 import org.junit.Test;

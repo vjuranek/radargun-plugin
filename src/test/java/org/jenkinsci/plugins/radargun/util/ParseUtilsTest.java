@@ -11,6 +11,7 @@ import java.util.Map;
 import org.jenkinsci.plugins.radargun.model.impl.MasterNode;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
+import org.jenkinsci.plugins.radargun.testutil.IOUtils;
 import org.junit.Test;
 
 public class ParseUtilsTest {

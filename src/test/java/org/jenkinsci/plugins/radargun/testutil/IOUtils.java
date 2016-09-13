@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.radargun.util;
+package org.jenkinsci.plugins.radargun.testutil;
 
 import java.io.IOException;
 import java.io.InputStream;
