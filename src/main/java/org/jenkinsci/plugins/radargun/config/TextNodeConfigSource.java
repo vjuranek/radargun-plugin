@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.radargun.config;
 
 import hudson.Extension;
 
+import hudson.remoting.VirtualChannel;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
@@ -21,7 +22,7 @@ public class TextNodeConfigSource extends NodeConfigSource {
     }
     
     @Override
-    public NodeList getNodesList() {
+    public NodeList getNodesList(VirtualChannel channel) {
         return ParseUtils.parseNodeList(Resolver.doResolve(nodes));
     }
     

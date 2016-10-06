@@ -6,6 +6,7 @@ import hudson.model.Descriptor;
 
 import java.io.IOException;
 
+import hudson.remoting.VirtualChannel;
 import jenkins.model.Jenkins;
 
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
@@ -19,7 +20,7 @@ import org.jenkinsci.plugins.radargun.model.impl.NodeList;
  */
 public abstract class NodeConfigSource implements Describable<NodeConfigSource> {
 
-    public abstract NodeList getNodesList() throws IOException, InterruptedException;
+    public abstract NodeList getNodesList(VirtualChannel channel) throws IOException, InterruptedException;
 
     @Override
     @SuppressWarnings("unchecked")

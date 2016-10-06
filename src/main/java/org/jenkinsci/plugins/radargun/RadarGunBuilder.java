@@ -130,7 +130,7 @@ public class RadarGunBuilder extends Builder {
         RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
         build.addAction(new RadarGunInvisibleAction(rgInstall.getHome()));
 
-        NodeList nodes = nodeSource.getNodesList();
+        NodeList nodes = nodeSource.getNodesList(launcher.getChannel());
 
         //check deprecated options
         Functions.checkDeprecatedConfigs(nodes, console);

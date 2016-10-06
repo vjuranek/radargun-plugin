@@ -3,9 +3,9 @@ package org.jenkinsci.plugins.radargun.config;
 import hudson.Extension;
 import hudson.FilePath;
 
-import java.io.File;
 import java.io.IOException;
 
+import hudson.remoting.VirtualChannel;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
@@ -25,13 +25,13 @@ public class FileNodeConfigSource extends NodeConfigSource {
     }
     
     @Override
-    public NodeList getNodesList() throws IOException, InterruptedException {
+    public NodeList getNodesList(VirtualChannel slaveChannel) throws IOException, InterruptedException {
         String nodeListPathRes = Resolver.doResolve(nodeListPath);
-        FilePath fp = new FilePath(new File(nodeListPathRes));
+        FilePath fp = new FilePath(slaveChannel, nodeListPathRes);
         String nodes = Resolver.doResolve(fp.readToString());
         return ParseUtils.parseNodeList(nodes);
     }
-    
+
     @Extension
     public static class DescriptorImpl extends NodeSourceDescriptor {
         public String getDisplayName() {
