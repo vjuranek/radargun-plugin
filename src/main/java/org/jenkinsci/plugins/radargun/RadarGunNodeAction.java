@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 import org.kohsuke.stapler.StaplerRequest;
@@ -23,6 +24,7 @@ public class RadarGunNodeAction implements Action {
     
     private final AbstractBuild<?, ?> build;
     private final String hostname;
+    private final String uuid;
     private final String actionName;
     private boolean inProgress;
     
@@ -30,6 +32,7 @@ public class RadarGunNodeAction implements Action {
     public RadarGunNodeAction(AbstractBuild<?, ?> build, String hostname) {
         this.build = build;
         this.hostname = hostname;
+        this.uuid = UUID.randomUUID().toString();
         this.actionName = DEFAULT_ACTION_NAME;
         this.inProgress = false;
     }
@@ -37,6 +40,15 @@ public class RadarGunNodeAction implements Action {
     public RadarGunNodeAction(AbstractBuild<?, ?> build, String hostname, String actionName) {
         this.build = build;
         this.hostname = hostname;
+        this.uuid = UUID.randomUUID().toString();
+        this.actionName = actionName;
+        this.inProgress = false;
+    }
+    
+    public RadarGunNodeAction(AbstractBuild<?, ?> build, String hostname, String actionName, String uuid) {
+        this.build = build;
+        this.hostname = hostname;
+        this.uuid = uuid;
         this.actionName = actionName;
         this.inProgress = false;
     }
@@ -66,7 +78,7 @@ public class RadarGunNodeAction implements Action {
     }
 
     public String getUrlName() {
-        return "console-" + Util.rawEncode(hostname);
+        return "console-" + Util.rawEncode(hostname) + "-" + uuid;
     }
     
     // required by index.jelly
@@ -100,7 +112,7 @@ public class RadarGunNodeAction implements Action {
     }
     
     public File getLogFile() {
-        String logFileName = hostname;
+        String logFileName = uuid == null ? hostname : hostname + "_" + uuid; //need to check uuid for backward comaptibility
         File gzipLogFile = new File(build.getRootDir(), logFileName + ".log.gz");
         if(gzipLogFile.isFile())
             return gzipLogFile;
