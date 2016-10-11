@@ -25,4 +25,14 @@ public class MasterNode extends Node {
         super(hostname, fqdn, jvmOptions, javaProps, envVars, beforeCmds, afterCmds);
     }
 
+    @Override
+    public boolean isMaster() {
+        return true;
+    }
+    
+    @Override //override to remove deprecation on master node
+    public String getJvmOptions() {
+        return super.getJvmOptions();
+    }
+    
 }
