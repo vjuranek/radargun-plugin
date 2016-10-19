@@ -1,0 +1,40 @@
+= Changelog
+
+== Upcomming changes
+
+== Release 1.2 (2016-10-19)
+
+* #58 Added Script source deprecation warning
+* #52 Removed deprecation from JVM option on master node
+* #53 Added action UUID so it can deal with same node names
+* #54 Nodelist file loads properly on slave executing the build
+* #51 RG logs are appneded, not 
+* Removed deprecation from ScriptSource
+* #47 Export Jenkins build number as RG_LOG_ID env. 
+* Fix another possible empty string issue
+* #48 Fixed remote cmd function
+* #45 Fixed CCE when parsing YAML config
+* #43 Fixed wrong WS being used - now one from config is used
+* #42 RG master process is killed on build exit
+* Exception stack trace is printed correctly
+* #41 Make sure to use hostname instead fqdn which can be null
+* Code refactoring and added process abstraction
+* Added more tests
+
+
+== Release 1.1 (2016-07-15)
+
+* #38 Provide console annotation capabilities
+* #39 Syntax highlighting
+* #23 Add support for user 
+* #35 Wait only for RG master to finish build
+* #37 Deprecated jvm options config
+* #32 #33 Several RG slaves can run on the same node
+* #36 Check if workspace exists
+* Fixed resolving of workspaces path on remote machines
+* Documentation inprovements
+
+
+== Release 1.0 (2016-02-12)
+
+* Initial release
