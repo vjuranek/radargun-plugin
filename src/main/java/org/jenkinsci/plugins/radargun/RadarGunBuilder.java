@@ -133,6 +133,10 @@ public class RadarGunBuilder extends Builder {
         NodeList nodes = nodeSource.getNodesList(launcher.getChannel());
 
         //check deprecated options
+        console.logAnnot("[RadarGun] WARN: As of RG plugin release 1.3, \"Start script\" config will be replaced by \"Remote login program\" "
+                + "options with limited config. options. Please make sure you don't use anything special in your start scripts (besides launching "
+                + "the RG master/slaves). If so, please move it into \"Node list\" section, where you can use \"beforeCmds:\" to execute "
+                + "custom commands on remote machines.");
         Functions.checkDeprecatedConfigs(nodes, console);
         
         RgBuild rgBuild = new RgBuild(this, build, launcher, nodes, rgInstall);
