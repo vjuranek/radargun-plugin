@@ -2,6 +2,7 @@
 
 == Upcomming changes
 
+* https://github.com/vjuranek/radargun-plugin/issues/63[#63] Predictable order or env. variables (mainly to avoid random failures)
 * https://github.com/vjuranek/radargun-plugin/issues/61[#61] Option which can be specified multiple times are now handled correctly
 
 == Release 1.2 (2016-10-19)

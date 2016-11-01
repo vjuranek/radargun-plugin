@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.radargun.config;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -94,7 +95,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
      */
     /*package*/ String prepareEnvVars(Map<String, String> envVars) {
         StringBuilder sb = new StringBuilder();
-        Iterator<String> envIter = envVars.keySet().iterator();
+        Iterator<String> envIter = new LinkedHashSet<String>(envVars.keySet()).iterator();
         while (envIter.hasNext()) {
             String key = envIter.next();
             String value = envVars.get(key) instanceof String ? envVars.get(key) : envVars.get(key).toString();
