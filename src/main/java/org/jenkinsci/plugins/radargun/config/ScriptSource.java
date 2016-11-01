@@ -2,8 +2,8 @@ package org.jenkinsci.plugins.radargun.config;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.jenkinsci.plugins.radargun.RgBuild;
@@ -95,7 +95,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
      */
     /*package*/ String prepareEnvVars(Map<String, String> envVars) {
         StringBuilder sb = new StringBuilder();
-        Iterator<String> envIter = new LinkedHashSet<String>(envVars.keySet()).iterator();
+        Iterator<String> envIter = new TreeSet<String>(envVars.keySet()).iterator();
         while (envIter.hasNext()) {
             String key = envIter.next();
             String value = envVars.get(key) instanceof String ? envVars.get(key) : envVars.get(key).toString();
