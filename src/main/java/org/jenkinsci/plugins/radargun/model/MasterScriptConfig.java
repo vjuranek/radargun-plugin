@@ -21,9 +21,9 @@ public interface MasterScriptConfig extends NodeScriptConfig {
     public MasterScriptConfig withReporter(String reporterPath);
     
     public static enum Options {
-        CONFIG_PATH(new Option("-c", "getConfigPath", true)), 
-        SLAVE_NUMBER(new Option("-s", "getSlaveNumber", true)),
-        REPORTER_PATH(new Option("--add-reporter", "getReporterPath", true));
+        CONFIG_PATH(new Option("-c", "getConfigPath", true, false)), 
+        SLAVE_NUMBER(new Option("-s", "getSlaveNumber", true, false)),
+        REPORTER_PATH(new Option("--add-reporter", "getReporterPath", true, true));
 
         private Option option;
 

@@ -14,14 +14,18 @@ import java.util.List;
  */
 public class Option {
 
+    public static final String MULTI_VALUE_SEPARATOR = " ";
+    
     private String optionSwitch;
     private String getterName;
     private boolean hasOptionValue;
+    private boolean isMultiValue;
 
-    public Option(String optionSwitch, String getterName, boolean hasOptionValue) {
+    public Option(String optionSwitch, String getterName, boolean hasOptionValue, boolean isMultiValue) {
         this.optionSwitch = optionSwitch;
         this.getterName = getterName;
         this.hasOptionValue = hasOptionValue;
+        this.isMultiValue = isMultiValue;
     }
 
     public String getOptionSwitch() {
@@ -35,6 +39,10 @@ public class Option {
     public boolean hasOptionValue() {
         return hasOptionValue;
     }
+    
+    public boolean isMultiValue() {
+        return isMultiValue;
+    }
 
     public List<String> getCmdOption(RgScriptConfig cfg) throws IllegalArgumentException {
         List<String> options = new ArrayList<String>();
@@ -44,8 +52,16 @@ public class Option {
             Object val = m.invoke(cfg);
             if (val != null) {
                 if (hasOptionValue()) {
-                    options.add(getOptionSwitch());
-                    options.add(val.toString());
+                    if (isMultiValue()) {
+                        String[] values = val.toString().split(MULTI_VALUE_SEPARATOR);
+                        for (String value : values) {
+                            options.add(getOptionSwitch());
+                            options.add(value);
+                        }
+                    } else {
+                        options.add(getOptionSwitch());
+                        options.add(val.toString());
+                    }
                 } else { // no value for this switch, getter should be boolean
                     if (((Boolean) val).booleanValue())
                         options.add(getOptionSwitch());

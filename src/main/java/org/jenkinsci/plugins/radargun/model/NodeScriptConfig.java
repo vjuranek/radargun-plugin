@@ -38,13 +38,13 @@ public interface NodeScriptConfig extends RgScriptConfig {
     public NodeScriptConfig withJavaOpts(String javaOpts);
 
     public static enum Options {
-        MASTER_HOST(new Option("-m", "getMasterHost", true)), 
-        OUTPUT_PATH(new Option("-o", "getOutputPath", true)), 
-        TAIL_FOLLOW(new Option("-t", "isTailFollow", false)), 
-        WAIT(new Option("-w", "isWait", false)), 
-        PLUGIN(new Option("--add-plugin", "getPlugin", true)), 
-        PLUGIN_CONFIG(new Option("--add-config", "getPluginConfig", true)),
-        JAVA_OPTS(new Option("-J", "getJavaOpts", true));
+        MASTER_HOST(new Option("-m", "getMasterHost", true, false)), 
+        OUTPUT_PATH(new Option("-o", "getOutputPath", true, false)), 
+        TAIL_FOLLOW(new Option("-t", "isTailFollow", false, false)), 
+        WAIT(new Option("-w", "isWait", false, false)), 
+        PLUGIN(new Option("--add-plugin", "getPlugin", true, true)), 
+        PLUGIN_CONFIG(new Option("--add-config", "getPluginConfig", true, true)),
+        JAVA_OPTS(new Option("-J", "getJavaOpts", true, false));
 
         private Option option;
 

@@ -17,8 +17,8 @@ public interface SlaveScriptConfig extends NodeScriptConfig {
     public SlaveScriptConfig withSlaveName(String slaveName);
     
     public static enum Options {
-        SLAVE_INDEX(new Option("-i", "getSlaveIndex", true)), 
-        SLAVE_NAME(new Option("-n", "getSlaveName", true));
+        SLAVE_INDEX(new Option("-i", "getSlaveIndex", true, false)), 
+        SLAVE_NAME(new Option("-n", "getSlaveName", true, false));
 
         private Option option;
 

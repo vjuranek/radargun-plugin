@@ -2,6 +2,8 @@
 
 == Upcomming changes
 
+* #61 Option which can be specified multiple times are now handled correctly
+
 == Release 1.2 (2016-10-19)
 
 * #58 Added Script source deprecation warning
