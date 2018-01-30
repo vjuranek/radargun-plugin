@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jenkinsci.plugins.radargun.config.NodeConfigSource;
-import org.jenkinsci.plugins.radargun.config.RadarGunCustomInstallation;
 import org.jenkinsci.plugins.radargun.config.RadarGunInstallationWrapper;
 import org.jenkinsci.plugins.radargun.config.RadarGunInstance;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
@@ -39,14 +38,14 @@ import hudson.model.Descriptor;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 public class RadarGunBuilder extends Builder {
 
     private static Logger LOGGER = Logger.getLogger(RadarGunBuilder.class.getName());
 
-    private final RadarGunInstance radarGunInstance;
+    private String radarGunName;
+    private RadarGunInstance radarGunInstance;
     private final ScenarioSource scenarioSource;
     private final NodeConfigSource nodeSource;
     private final ScriptSource scriptSource;
@@ -74,9 +73,13 @@ public class RadarGunBuilder extends Builder {
     }
     
     /**
-     * For keeping backward compatibility defaults in ssh as a remote login program
+     * For keeping backward compatibility defaults in ssh as a remote login program and converts RG name into RG installation wrapper
      */
     public RadarGunBuilder readResolve() {
+        if ((radarGunInstance == null) && (radarGunName != null)) {
+            radarGunInstance = new RadarGunInstallationWrapper(radarGunName);
+            radarGunName = null;
+        }
         if (this.remoteLoginProgram == null) {
             this.remoteLoginProgram = RemoteLoginProgram.SSH.getName().toUpperCase();
         }

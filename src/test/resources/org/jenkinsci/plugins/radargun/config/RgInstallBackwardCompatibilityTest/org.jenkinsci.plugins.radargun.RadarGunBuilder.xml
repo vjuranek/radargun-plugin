@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<org.jenkinsci.plugins.radargun.RadarGunBuilder_-DescriptorImpl plugin="radargun@1.2">
+  <installations>
+    <org.jenkinsci.plugins.radargun.RadarGunInstallation>
+      <name>rg-snapshot</name>
+      <home>/tmp/radarun/RadarGun-SNAPSHOT</home>
+      <properties/>
+    </org.jenkinsci.plugins.radargun.RadarGunInstallation>
+    <org.jenkinsci.plugins.radargun.RadarGunInstallation>
+      <name>rg3.0-snapshot</name>
+      <home>/tmp/radargun/RadarGun-3.0.0-SNAPSHOT</home>
+      <properties/>
+    </org.jenkinsci.plugins.radargun.RadarGunInstallation>
+    <org.jenkinsci.plugins.radargun.RadarGunInstallation>
+      <name>rg3-docker</name>
+      <home>/opt/radargun</home>
+      <properties/>
+    </org.jenkinsci.plugins.radargun.RadarGunInstallation>
+  </installations>
+</org.jenkinsci.plugins.radargun.RadarGunBuilder_-DescriptorImpl>

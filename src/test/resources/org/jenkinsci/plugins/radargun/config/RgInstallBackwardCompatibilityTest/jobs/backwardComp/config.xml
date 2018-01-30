@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>3</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <org.jenkinsci.plugins.radargun.RadarGunBuilder plugin="radargun@1.0-SNAPSHOT">
+      <radarGunName>rg-snapshot</radarGunName>
+      <scenarioSource class="org.jenkinsci.plugins.radargun.config.FileScenarioSource">
+        <scenarioPath>$RADARGUN_HOME/conf/benchmark-dist.xml</scenarioPath>
+      </scenarioSource>
+      <nodeSource class="org.jenkinsci.plugins.radargun.config.TextNodeConfigSource">
+	<nodes>---
+defaults: &amp;defaults
+  JAVA_HOME: /usr/lib/jvm/java-1.8.0-openjdk
+
+nodes:
+- node1:
+    fqdn: 172.17.0.2
+    envVars: 
+      &lt;&lt;: *defaults
+      aaa: 111
+    beforeCmds:
+      - echo &quot;aaa&quot; &gt; /tmp/aaa.txt
+      - ls -la /tmp
+    afterCmds:
+      - rm /tmp/aaa.txt
+
+- node1:
+    fqdn: 172.17.0.2
+    jvmOpts: &quot;-server -XX:+UseLargePages&quot;
+    envVars: 
+      &lt;&lt;: *defaults
+
+- node2:
+    fqdn: 172.17.0.3
+    envVars: 
+	&lt;&lt;: *defaults</nodes>
+      </nodeSource>
+      <scriptSource class="org.jenkinsci.plugins.radargun.config.TextScriptSource">
+        <masterScript>#!/bin/bash
+set -x
+echo &quot;ssh $@&quot;</masterScript>
+        <slaveScript>#!/bin/bash
+set -x
+echo &quot;ssh $@&quot;</slaveScript>
+      </scriptSource>
+      <workspacePath>$WORKSPACE</workspacePath>
+      <pluginPath>plugin-path</pluginPath>
+      <pluginConfigPath>plugin:config-path</pluginConfigPath>
+      <reporterPath>reporter-path</reporterPath>
+    </org.jenkinsci.plugins.radargun.RadarGunBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
