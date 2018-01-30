@@ -7,8 +7,13 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.jenkinsci.plugins.radargun.RadarGunBuilder;
+import org.jenkinsci.plugins.radargun.RadarGunInstallation;
 import org.jenkinsci.plugins.radargun.RemoteLoginProgram;
 import org.jenkinsci.plugins.radargun.RgBuild;
+import org.jenkinsci.plugins.radargun.config.RadarGunCustomInstallation;
+import org.jenkinsci.plugins.radargun.config.RadarGunInstallationWrapper;
+import org.jenkinsci.plugins.radargun.config.RadarGunInstance;
 import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 
@@ -16,6 +21,7 @@ import hudson.FilePath;
 import hudson.Launcher.ProcStarter;
 import hudson.model.BuildListener;
 import hudson.model.StreamBuildListener;
+import jenkins.model.Jenkins;
 
 /**
  * 
@@ -91,5 +97,11 @@ public class Functions {
     
     public static boolean isNullOrEmpty(String str) {
         return ((str == null) || (str.trim().isEmpty()));
+    }
+    
+    public static RadarGunInstallation getRgInstallation(RadarGunInstance radarGunInstance) {
+        return radarGunInstance instanceof RadarGunInstallationWrapper  
+        ? Jenkins.getInstance().getDescriptorByType(RadarGunBuilder.DescriptorImpl.class).getInstallation(((RadarGunInstallationWrapper)radarGunInstance).getRadarGunName())
+        : new RadarGunInstallation(radarGunInstance.getName(), ((RadarGunCustomInstallation)radarGunInstance).getHome(),  null);
     }
 }

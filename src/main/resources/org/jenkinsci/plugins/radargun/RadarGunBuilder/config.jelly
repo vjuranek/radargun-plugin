@@ -1,9 +1,16 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson"
     xmlns:f="/lib/form">
 
-    <f:entry title="RadarGun instance">
-        <f:select field="radarGunName" />
-    </f:entry>
+    <j:set var="currInstall" value="${instance.radarGunInstance}" />
+    <f:dropdownList name="radarGunInstance" title="RadarGun instance" description="RadarGun installation to be used">
+        <j:forEach var="desc" items="${descriptor.rgInstances}" varStatus="loop">
+            <f:dropdownListBlock title="${desc.displayName}" value="${loop.index}"
+                selected="${desc==currInstall.descriptor}" staplerClass="${desc.clazz.name}">
+                <j:set var="instance" value="${currInstall}" />
+                <st:include page="${desc.configPage}" from="${desc}" />
+            </f:dropdownListBlock>
+        </j:forEach>
+    </f:dropdownList>
 
     <j:set var="currScenario" value="${instance.scenarioSource}" />
     <f:dropdownList name="scenarioSource" title="RadarGun scenario" description="RadarGun scenarion to be executed">

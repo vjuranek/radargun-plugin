@@ -10,6 +10,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jenkinsci.plugins.radargun.config.NodeConfigSource;
+import org.jenkinsci.plugins.radargun.config.RadarGunCustomInstallation;
+import org.jenkinsci.plugins.radargun.config.RadarGunInstallationWrapper;
+import org.jenkinsci.plugins.radargun.config.RadarGunInstance;
 import org.jenkinsci.plugins.radargun.config.ScenarioSource;
 import org.jenkinsci.plugins.radargun.config.ScriptSource;
 import org.jenkinsci.plugins.radargun.model.RgMasterProcess;
@@ -25,7 +28,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 import hudson.AbortException;
-import hudson.CopyOnWrite;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
@@ -37,13 +39,14 @@ import hudson.model.Descriptor;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 public class RadarGunBuilder extends Builder {
 
     private static Logger LOGGER = Logger.getLogger(RadarGunBuilder.class.getName());
 
-    private final String radarGunName;
+    private final RadarGunInstance radarGunInstance;
     private final ScenarioSource scenarioSource;
     private final NodeConfigSource nodeSource;
     private final ScriptSource scriptSource;
@@ -55,10 +58,10 @@ public class RadarGunBuilder extends Builder {
     private final String reporterPath;
 
     @DataBoundConstructor
-    public RadarGunBuilder(String radarGunName, ScenarioSource scenarioSource, NodeConfigSource nodeSource,
+    public RadarGunBuilder(RadarGunInstance radarGunInstance, ScenarioSource scenarioSource, NodeConfigSource nodeSource,
             ScriptSource scriptSource, String remoteLoginProgram, String remoteLogin, String workspacePath, String pluginPath, String pluginConfigPath,
             String reporterPath) {
-        this.radarGunName = radarGunName;
+        this.radarGunInstance = radarGunInstance;
         this.scenarioSource = scenarioSource;
         this.nodeSource = nodeSource;
         this.scriptSource = scriptSource;
@@ -80,8 +83,8 @@ public class RadarGunBuilder extends Builder {
         return this;
     }
 
-    public String getRadarGunName() {
-        return radarGunName;
+    public RadarGunInstance getRadarGunInstance() {
+        return radarGunInstance;
     }
 
     public ScenarioSource getScenarioSource() {
@@ -127,7 +130,8 @@ public class RadarGunBuilder extends Builder {
         Resolver.init(build);
         ConsoleLogger console = new ConsoleLogger(listener);
         
-        RadarGunInstallation rgInstall = getDescriptor().getInstallation(radarGunName);
+        RadarGunInstallation rgInstall = Functions.getRgInstallation(radarGunInstance);
+            
         build.addAction(new RadarGunInvisibleAction(rgInstall.getHome()));
 
         NodeList nodes = nodeSource.getNodesList(launcher.getChannel());
@@ -214,8 +218,7 @@ public class RadarGunBuilder extends Builder {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-        @CopyOnWrite
-        private volatile List<RadarGunInstallation> installations = new ArrayList<RadarGunInstallation>();
+        private volatile List<RadarGunInstallation> installations = new ArrayList<>();
 
         public DescriptorImpl() {
             load();
@@ -224,14 +227,23 @@ public class RadarGunBuilder extends Builder {
         public List<RadarGunInstallation> getInstallations() {
             return installations;
         }
-
-        public void setInstallations(RadarGunInstallation... installations) {
-            this.installations = new ArrayList<RadarGunInstallation>();
-            for (RadarGunInstallation installation : installations) {
-                this.installations.add(installation);
+        
+        public List<RadarGunInstallationWrapper> getInstallationWrappers() {
+            List<RadarGunInstallationWrapper> wrappers = new ArrayList<>();
+            for (RadarGunInstallation inst : installations) {
+                wrappers.add(new RadarGunInstallationWrapper(inst.getName()));
             }
+            return wrappers;
         }
-
+        
+        public void setInstallations(RadarGunInstallation... installations) {
+            List<RadarGunInstallation> installs = new ArrayList<>();
+            for (RadarGunInstallation installation : installations) {
+                installs.add(installation);
+            }
+            this.installations = installs;
+        }
+        
         public RadarGunInstallation getInstallation(String installationName) {
             if (installationName == null || installationName.isEmpty())
                 return null;
@@ -267,6 +279,10 @@ public class RadarGunBuilder extends Builder {
             return lb;
         }
 
+        public static DescriptorExtensionList<RadarGunInstance, Descriptor<RadarGunInstance>> getRgInstances() {
+            return RadarGunInstance.all();
+        }
+        
         public static DescriptorExtensionList<ScenarioSource, Descriptor<ScenarioSource>> getScenarioSources() {
             return ScenarioSource.all();
         }

@@ -1,29 +1,29 @@
 package org.jenkinsci.plugins.radargun;
 
-import hudson.AbortException;
-import hudson.EnvVars;
-import hudson.Extension;
-import hudson.Util;
-import hudson.model.EnvironmentSpecific;
-import hudson.model.TaskListener;
-import hudson.model.Node;
-import hudson.remoting.VirtualChannel;
-import hudson.slaves.NodeSpecific;
-import hudson.tools.ToolInstaller;
-import hudson.tools.ToolProperty;
-import hudson.tools.ToolDescriptor;
-import hudson.tools.ToolInstallation;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import jenkins.model.Jenkins;
-import jenkins.security.MasterToSlaveCallable;
-
 import org.jenkinsci.plugins.radargun.model.RgScriptConfig;
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import hudson.AbortException;
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.Util;
+import hudson.model.EnvironmentSpecific;
+import hudson.model.ModelObject;
+import hudson.model.Node;
+import hudson.model.TaskListener;
+import hudson.remoting.VirtualChannel;
+import hudson.slaves.NodeSpecific;
+import hudson.tools.ToolDescriptor;
+import hudson.tools.ToolInstallation;
+import hudson.tools.ToolInstaller;
+import hudson.tools.ToolProperty;
+import jenkins.model.Jenkins;
+import jenkins.security.MasterToSlaveCallable;
 
 /**
  * RadarGunInstallation
@@ -32,13 +32,18 @@ import org.kohsuke.stapler.DataBoundConstructor;
  * 
  */
 public class RadarGunInstallation extends ToolInstallation implements EnvironmentSpecific<RadarGunInstallation>,
-        NodeSpecific<RadarGunInstallation> {
+        NodeSpecific<RadarGunInstallation>, ModelObject {
 
     @DataBoundConstructor
     public RadarGunInstallation(String name, String home, List<? extends ToolProperty<?>> properties) {
         super(name, home, properties);
     }
 
+    @Override
+    public String getDisplayName() {
+        return getName();
+    }
+    
     @Override
     public RadarGunInstallation forEnvironment(EnvVars environment) {
         return new RadarGunInstallation(getName(), environment.expand(getHome()), getProperties().toList());
