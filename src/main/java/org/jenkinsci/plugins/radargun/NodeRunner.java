@@ -1,13 +1,13 @@
 package org.jenkinsci.plugins.radargun;
 
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hudson.Launcher.ProcStarter;
 import hudson.Proc;
 
-public class NodeRunner implements Callable<Integer> {
+public class NodeRunner implements Supplier<Integer> {
     
     private static Logger LOGGER = Logger.getLogger(NodeRunner.class.getName());
     
@@ -25,7 +25,7 @@ public class NodeRunner implements Callable<Integer> {
     }*/
     
     @Override
-    public Integer call() {
+    public Integer get() {
         LOGGER.log(Level.FINER, String.format("Staring runner %s", nodeAction.getDisplayName()));
         nodeAction.setInProgress(true);
         Integer retCode = 1; //error by default
