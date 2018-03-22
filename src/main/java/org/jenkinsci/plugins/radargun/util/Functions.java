@@ -102,6 +102,6 @@ public class Functions {
     public static RadarGunInstallation getRgInstallation(RadarGunInstance radarGunInstance) {
         return radarGunInstance instanceof RadarGunInstallationWrapper  
         ? Jenkins.getInstance().getDescriptorByType(RadarGunBuilder.DescriptorImpl.class).getInstallation(((RadarGunInstallationWrapper)radarGunInstance).getRadarGunName())
-        : new RadarGunInstallation(radarGunInstance.getName(), ((RadarGunCustomInstallation)radarGunInstance).getHome(),  null);
+        : new RadarGunInstallation(Resolver.doResolve(radarGunInstance.getName()), Resolver.doResolve(((RadarGunCustomInstallation)radarGunInstance).getHome()),  null);
     }
 }
