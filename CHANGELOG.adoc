@@ -2,9 +2,14 @@
 
 == Upcomming changes
 
+== Release 1.4 (2018-03-23)
+
+* https://github.com/vjuranek/radargun-plugin/issues/70[#70]  Custom RG install path cannot resolve env. variables
+* https://github.com/vjuranek/radargun-plugin/issues/69[#69]  Switched to `CompleteableFuture`
+
 == Release 1.3 (2018-01-31)
 
-* https://github.com/vjuranek/radargun-plugin/issues/63[#1]  Allow to specify custom RG installation path
+* https://github.com/vjuranek/radargun-plugin/issues/1[#1]   Allow to specify custom RG installation path
 * https://github.com/vjuranek/radargun-plugin/issues/63[#63] Predictable order or env. variables (mainly to avoid random failures)
 * https://github.com/vjuranek/radargun-plugin/issues/61[#61] Option which can be specified multiple times are now handled correctly
 
