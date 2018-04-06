@@ -2,6 +2,7 @@
 
 == Upcomming changes
 
+* https://github.com/vjuranek/radargun-plugin/issues/73[#73]  RG installation list is not saved on Jenkins 2.x
 * Fixed couple of issues found by FindBugs
 * Switched to Jenkins 2.X (2.60.3 as a baseline)
 
