@@ -25,6 +25,6 @@ public enum RemoteLoginProgram {
     }
     
     public String[] getCmd() {
-        return cmd;
+        return cmd.clone();
     }
 }
