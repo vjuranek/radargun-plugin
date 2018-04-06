@@ -2,6 +2,9 @@
 
 == Upcomming changes
 
+* Fixed couple of issues found by FindBugs
+* Switched to Jenkins 2.X (2.60.3 as a baseline)
+
 == Release 1.4 (2018-03-23)
 
 * https://github.com/vjuranek/radargun-plugin/issues/70[#70]  Custom RG install path cannot resolve env. variables
