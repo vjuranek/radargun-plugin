@@ -245,6 +245,7 @@ public class RadarGunBuilder extends Builder {
                 installs.add(installation);
             }
             this.installations = installs;
+            save();
         }
         
         public RadarGunInstallation getInstallation(String installationName) {
