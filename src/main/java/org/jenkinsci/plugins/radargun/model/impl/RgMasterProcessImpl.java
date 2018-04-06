@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.radargun.model.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -126,7 +127,7 @@ public class RgMasterProcessImpl extends AbstractRgProcess implements RgMasterPr
         if (retCode != 0) {
             throw new IOException("Unable to read master.pid file!");
         }
-        String pid = baos.toString();
+        String pid = new String(baos.toByteArray(), Charset.defaultCharset());
         return Integer.valueOf(pid.substring(0, pid.length() - 1));
     }
 

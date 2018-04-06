@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
@@ -88,7 +89,7 @@ public class RadarGunNodeAction implements Action {
     
     // required by consoleText.jelly
     public Reader getLogReader() throws IOException {
-        return new InputStreamReader(getLogInputStream());
+        return new InputStreamReader(getLogInputStream(), Charset.defaultCharset());
     }
     
     public InputStream getLogInputStream() throws IOException {
@@ -104,7 +105,7 @@ public class RadarGunNodeAction implements Action {
         }
         
         String message = "No such file: " + logFile;
-        return new ByteArrayInputStream(message.getBytes());
+        return new ByteArrayInputStream(message.getBytes(Charset.defaultCharset()));
     }
     
     public void doProgressiveLog(StaplerRequest req, StaplerResponse rsp) throws IOException {

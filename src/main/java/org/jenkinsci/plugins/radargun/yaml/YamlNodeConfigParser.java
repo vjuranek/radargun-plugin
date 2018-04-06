@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -140,7 +141,8 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         String content = null;
         File f = new File(filePath);
         try (InputStream is = new FileInputStream(f)) {
-            Scanner s = new Scanner(is).useDelimiter(EOF_REG_EXP);
+            Scanner s = new Scanner(is, Charset.defaultCharset().name());
+            s.useDelimiter(EOF_REG_EXP);
             content = s.hasNext() ? s.next() : null;
         } catch (IOException e) {
             throw new IllegalArgumentException("File to be included doesn't exists!", e);
