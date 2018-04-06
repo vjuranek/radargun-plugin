@@ -75,15 +75,15 @@ public class YamlNodeConfigParser implements NodeConfigParser {
                     "Wrong node configuration, at least two nodes (one master and one slave) required!");
 
         Map<String, Object> masterConf = nodesConf.remove(0);
-        String masterHost = masterConf.keySet().iterator().next();
+        Map.Entry<String, Object> masterHost = masterConf.entrySet().iterator().next();
         @SuppressWarnings("unchecked")
-        MasterNode master = parseMasterNode(masterHost, (Map<String, Object>) masterConf.get(masterHost));
+        MasterNode master = parseMasterNode(masterHost.getKey(), (Map<String, Object>) masterHost.getValue());
 
         List<Node> nodes = new LinkedList<Node>();
         for (Map<String, Object> nodeConf : nodesConf) {
-            String nodeHost = nodeConf.keySet().iterator().next();
+            Map.Entry<String, Object> nodeHost = nodeConf.entrySet().iterator().next();
             @SuppressWarnings("unchecked")
-            Node node = parseNode(nodeHost, (Map<String, Object>) nodeConf.get(nodeHost));
+            Node node = parseNode(nodeHost.getKey(), (Map<String, Object>)nodeHost.getValue());
             nodes.add(node);
         }
 

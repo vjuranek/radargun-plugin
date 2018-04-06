@@ -18,11 +18,10 @@ public class ParseUtils {
         if (!(map instanceof Map<?, ?>)) {
             throw new IllegalArgumentException(String.format("Cannot cast %s to Map<String, ?>", map.getClass().getName()));
         }
-        @SuppressWarnings("unchecked")
-        Map<String, ?> strKeyMap = (Map<String, ?>)map;
+        
         Map<String, String> strMap = new HashMap<String, String>();
-        for (String key : strKeyMap.keySet()) {
-            strMap.put(key, strKeyMap.get(key).toString());
+        for (Map.Entry<?, ?> e : ((Map<?, ?>)map).entrySet()) {
+            strMap.put(e.getKey().toString(), e.getValue().toString());
         }
         return strMap;
     }

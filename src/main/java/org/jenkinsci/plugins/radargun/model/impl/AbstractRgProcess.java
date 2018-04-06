@@ -23,7 +23,7 @@ public abstract class AbstractRgProcess implements RgProcess {
         try {
         processFuture = CompletableFuture.supplyAsync(createRunner()).exceptionally((e) -> {
             LOGGER.log(Level.WARNING, "Execution of RG process has failed", e.fillInStackTrace());
-            return new Integer(1);
+            return Integer.valueOf(1);
         });
         } catch(IOException|InterruptedException e) {
             LOGGER.log(Level.WARNING, "Some of the previous steps has failed or was interrupted", e.fillInStackTrace());
