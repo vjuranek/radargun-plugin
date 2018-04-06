@@ -76,10 +76,14 @@ public class Functions {
     }
     
     public static FilePath getRemoteWorkspace(RgBuild rgBuild) throws IOException, InterruptedException {
+        if (rgBuild == null || rgBuild.getBuild() == null || rgBuild.getBuild().getBuiltOn() == null) {
+            throw new IllegalArgumentException("RgBuild or node there it was built is null");
+        }
         String wsPath = rgBuild.getRgBuilder().getWorkspacePath();
+        hudson.model.Node n = rgBuild.getBuild().getBuiltOn();
         FilePath workspace = isNullOrEmpty(wsPath) ? 
                 rgBuild.getBuild().getWorkspace()
-                : rgBuild.getBuild().getBuiltOn().createPath(Resolver.buildVar(rgBuild.getBuild(), wsPath));
+                : n.createPath(Resolver.buildVar(rgBuild.getBuild(), wsPath));
         if (workspace != null && !workspace.exists()) {
             throw new IOException(String.format("Workspace path '%s' doesn't exists! Check your job configuration!", workspace.getRemote()));
         }

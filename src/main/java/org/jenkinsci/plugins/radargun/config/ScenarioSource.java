@@ -13,8 +13,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 
 /**
- * Base class for RG scenarios providers. Takes care about loading scenarios, expanding Jenkins variables and
- * createing/deleteing temporal scenario file with resolved variables.
+ * Base class for RG scenarios providers. Takes care about loading scenarios, expanding Jenkins variables and createing/deleteing temporal scenario file with resolved variables.
  * 
  * @author vjuranek
  * 
@@ -27,8 +26,7 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
     private transient String tmpScenarioPath;
     private transient FilePath tmpScenario;
 
-    protected abstract FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException,
-            IOException;
+    protected abstract FilePath createTmpScenrioFile(AbstractBuild<?, ?> build) throws InterruptedException, IOException;
 
     public String getTmpScenarioPath(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
         tmpScenario = createTmpScenrioFile(build);
@@ -39,17 +37,18 @@ public abstract class ScenarioSource implements Describable<ScenarioSource> {
     /**
      * Replace parameters in scenario and stores scenario into tmp file in workspace
      */
-    public FilePath tmpScenarioFromContent(String scenarioContent, AbstractBuild<?, ?> build)
-            throws InterruptedException, IOException {
+    public FilePath tmpScenarioFromContent(String scenarioContent, AbstractBuild<?, ?> build) throws InterruptedException, IOException {
         // String scenario = Resolver.buildVar(build, scenarioContent);
         // TODO env. var expansion? Expand on node where it will be launched
-        FilePath path = build.getWorkspace().createTextTempFile(DEFAULT_SCENARIO_NAME, DEFAULT_SCENARIO_SUFFIX,
-                scenarioContent, true);
+        FilePath path = null;
+        FilePath ws = build.getWorkspace();
+        if (ws != null) {
+            path = ws.createTextTempFile(DEFAULT_SCENARIO_NAME, DEFAULT_SCENARIO_SUFFIX, scenarioContent, true);
+        }
         return path;
     }
 
-    public FilePath tmpScenarioFromFile(String scenarioPath, AbstractBuild<?, ?> build) throws InterruptedException,
-            IOException {
+    public FilePath tmpScenarioFromFile(String scenarioPath, AbstractBuild<?, ?> build) throws InterruptedException, IOException {
         String path = Resolver.buildVar(build, scenarioPath);
         FilePath fp = new FilePath(build.getWorkspace(), path);
         String scenarioContent = fp.readToString(); // TODO not very safe, if e.g. some malicious user provide path to
