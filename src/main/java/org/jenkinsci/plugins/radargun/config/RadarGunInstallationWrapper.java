@@ -12,7 +12,6 @@ import jenkins.model.Jenkins;
 public class RadarGunInstallationWrapper extends RadarGunInstance {
 
     private String radarGunName;
-    //private transient RadarGunInstallation install;
     
     @DataBoundConstructor
     public RadarGunInstallationWrapper(String radarGunName) {
@@ -20,19 +19,7 @@ public class RadarGunInstallationWrapper extends RadarGunInstance {
             throw new IllegalArgumentException("RG installation name cannot be null");
         }
         this.radarGunName = radarGunName;
-        //this.install = Jenkins.getInstance().getDescriptorByType(RadarGunBuilder.DescriptorImpl.class).getInstallation(radarGunName);
     }
-    
-    /*public RadarGunInstallationWrapper(RadarGunInstallation install) {
-        if (install == null) {
-            throw new IllegalArgumentException("RG installation cannot be null");
-        }
-        this.install = install;
-    }
-    
-    public RadarGunInstallation getInsall() {
-        return install;
-    }*/
     
     public String getRadarGunName() {
         return radarGunName;
@@ -41,14 +28,6 @@ public class RadarGunInstallationWrapper extends RadarGunInstance {
     public String getName() {
         return getRadarGunName();
     }
-    
-    /*public String getHome() {
-        return install.getHome();
-    }
-    
-    public String getDisplayName() {
-        return install.getDisplayName();
-    }*/
     
     @Extension
     public static class DescriptorImpl extends RadarGunInstallationDescriptor {
