@@ -80,7 +80,7 @@ public class Functions {
         FilePath workspace = isNullOrEmpty(wsPath) ? 
                 rgBuild.getBuild().getWorkspace()
                 : rgBuild.getBuild().getBuiltOn().createPath(Resolver.buildVar(rgBuild.getBuild(), wsPath));
-        if (!workspace.exists()) {
+        if (workspace != null && !workspace.exists()) {
             throw new IOException(String.format("Workspace path '%s' doesn't exists! Check your job configuration!", workspace.getRemote()));
         }
         return workspace;
