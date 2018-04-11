@@ -21,7 +21,7 @@ public abstract class AbstractRgProcess implements RgProcess {
     @Override
     public void start(ExecutorService executorService) throws IllegalStateException {
         try {
-        processFuture = CompletableFuture.supplyAsync(createRunner()).exceptionally((e) -> {
+        processFuture = CompletableFuture.supplyAsync(createRunner(), executorService).exceptionally((e) -> {
             LOGGER.log(Level.WARNING, "Execution of RG process has failed", e.fillInStackTrace());
             return Integer.valueOf(1);
         });
