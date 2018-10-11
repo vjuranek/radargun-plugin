@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.radargun.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,7 +24,7 @@ public class ParseUtilsTest {
         
         assertNotNull("Unable to load test YAML config file", config);
         NodeList nodes = ParseUtils.parseNodeList(config);
-        assertEquals(2, nodes.getNodes().size());
+        assertEquals(3, nodes.getNodes().size());
         
         MasterNode master = (MasterNode) nodes.getMaster();
         assertEquals("172.12.0.8", master.getFqdn());
@@ -45,7 +47,8 @@ public class ParseUtilsTest {
         assertEquals(1, afterCmds.size());
         assertEquals("rm -rf /tmp/aaa.txt", afterCmds.get(0));
         
-        assertEquals(1, nodes.getSlaveCount());
+        assertEquals(2, nodes.getSlaveCount());
+        
         Node slave = nodes.getNodes().get(1);
         assertEquals("edg-perf01", slave.getName());
         assertNull(slave.getJvmOptions());
@@ -62,5 +65,10 @@ public class ParseUtilsTest {
         assertEquals("rm -rf /tmp/aaa.txt", beforeCmds.get(0));
         afterCmds = slave.getAfterCmds();
         assertNull(afterCmds);
+        assertTrue(slave.getGatherLogs());
+        
+        slave = nodes.getNodes().get(2);
+        assertEquals("edg-perf02", slave.getName());
+        assertFalse(slave.getGatherLogs());
     }
 }

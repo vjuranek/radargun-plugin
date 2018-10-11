@@ -14,15 +14,15 @@ import java.util.Map;
 public class MasterNode extends Node {
     
     public MasterNode(Node node) {
-        super(node.getName(), node.getFqdn(), node.getJvmOptions(), node.getJavaProps(), node.getEnvVars(), node.getBeforeCmds(), node.getAfterCmds());
+        super(node.getName(), node.getFqdn(), node.getJvmOptions(), node.getJavaProps(), node.getEnvVars(), node.getBeforeCmds(), node.getAfterCmds(), node.getGatherLogs());
     }
     
     public MasterNode(String name, String fqdn) {
         super(name, fqdn);
     }
 
-    public MasterNode(String hostname, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds) {
-        super(hostname, fqdn, jvmOptions, javaProps, envVars, beforeCmds, afterCmds);
+    public MasterNode(String hostname, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds, boolean gatherLogs) {
+        super(hostname, fqdn, jvmOptions, javaProps, envVars, beforeCmds, afterCmds, gatherLogs);
     }
 
     @Override

@@ -50,6 +50,7 @@ public class YamlNodeConfigParser implements NodeConfigParser {
     public static final String ENV_VARS_KEY = "envVars";
     public static final String BEFORE_CMDS = "beforeCmds";
     public static final String AFTER_CMDS = "afterCmds";
+    public static final String GATHET_LOGS = "gatherLogs";
 
     public static final String LINE_SEP = System.getProperty("line.separator");
     public static final String EOF_REG_EXP = "\\A";
@@ -106,7 +107,8 @@ public class YamlNodeConfigParser implements NodeConfigParser {
         List<String> beforeCmds = nodeConfig.containsKey(BEFORE_CMDS) ? (List<String>) nodeConfig.get(BEFORE_CMDS) : null;
         @SuppressWarnings("unchecked")
         List<String> afterCmds = nodeConfig.containsKey(AFTER_CMDS) ? (List<String>) nodeConfig.get(AFTER_CMDS) : null;
-        return new Node(name, fqdn, jvmOpts, javaProps, envVars, beforeCmds, afterCmds);
+        boolean gatherLogs = nodeConfig.containsKey(GATHET_LOGS) ? (Boolean) nodeConfig.get(GATHET_LOGS) : true; // by default gather logs from all machines
+        return new Node(name, fqdn, jvmOpts, javaProps, envVars, beforeCmds, afterCmds, gatherLogs);
     }
 
     private MasterNode parseMasterNode(String name, Map<String, Object> nodeConfig) {

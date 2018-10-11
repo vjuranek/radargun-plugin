@@ -13,6 +13,7 @@ public class Node {
     private final Map<String, String> envVars;
     private final List<String> beforeCmds;
     private final List<String> afterCmds;
+    private final boolean gatherLogs;
 
     public Node(String name) {
         this.name = name;
@@ -22,6 +23,7 @@ public class Node {
         this.envVars = null;
         this.beforeCmds = null;
         this.afterCmds = null;
+        this.gatherLogs = true;
     }
     
     public Node(String name, String fqdn) {
@@ -32,9 +34,10 @@ public class Node {
         this.envVars = null;
         this.beforeCmds = null;
         this.afterCmds = null;
+        this.gatherLogs = true;
     }
 
-    public Node(String name, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds) {
+    public Node(String name, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds, boolean gatherLogs) {
         this.name = name;
         this.fqdn = fqdn;
         this.jvmOptions = jvmOptions;
@@ -42,6 +45,7 @@ public class Node {
         this.envVars = envVars;
         this.beforeCmds = beforeCmds;
         this.afterCmds = afterCmds;
+        this.gatherLogs = gatherLogs;
     }
 
     public boolean isMaster() {
@@ -87,6 +91,10 @@ public class Node {
         return afterCmds;
     }
 
+    public boolean getGatherLogs() {
+        return gatherLogs;
+    }
+    
     public String getJavaPropsWithPrefix() {
         if (javaProps == null || javaProps.size() == 0) return null;
         
@@ -111,5 +119,4 @@ public class Node {
         sb.append('\'');
         return sb.toString();
     }
-    
 }

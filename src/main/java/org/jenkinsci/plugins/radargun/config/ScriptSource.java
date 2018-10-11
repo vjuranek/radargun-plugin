@@ -62,10 +62,13 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         //into cmd array
         cmd = node.getEnvVars() == null ? cmd : (String[]) ArrayUtils.addAll(cmd, new String[] { ENV_CMD, prepareEnvVars(node.getEnvVars()) });
         
-        // Run with "tail" option ("-t") not to finish immediately once the RG process is started.
+        // Check whether to gather logs, i.e. run with "tail" option ("-t") 
+        if (node.getGatherLogs()) {
+            nodeScriptConfig.withTailFollow();
+        }
+        // Always run with wait ("-w") option not to finish immediately once the RG process is started.
         // Otherwise Jenkins finish the process and kill all background thread, i.e. kill RG master.
-        // And also to gather the log from master
-        nodeScriptConfig.withTailFollow().withWait();
+        nodeScriptConfig.withWait();
         cmd = (String[]) ArrayUtils.addAll(cmd, nodeScriptConfig.getScriptCmd());
         
         //set up user after commands

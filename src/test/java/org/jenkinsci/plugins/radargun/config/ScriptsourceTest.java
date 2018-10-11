@@ -32,7 +32,7 @@ public class ScriptsourceTest {
         javaProps.put("-Dmy_prop1", "prop1");
         javaProps.put("-Dmy_prop2", "prop2");
 
-        node = new Node("testNode", "node.test.org", "-Xms4G -Xmx16G", javaProps, env, null, null);
+        node = new Node("testNode", "node.test.org", "-Xms4G -Xmx16G", javaProps, env, null, null, true);
 
         nodeCfg = new MasterShellScript();
         nodeCfg.withJavaOpts("-Drg_pro1=rgProp1 -Drg_prop2=rgProp2");
