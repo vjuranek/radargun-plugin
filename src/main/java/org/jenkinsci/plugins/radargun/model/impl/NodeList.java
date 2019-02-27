@@ -50,4 +50,11 @@ public class NodeList {
     public int getSlaveCount() {
         return nodes.size() - 1;
     }
+
+    @Override
+    public String toString() {
+        return "NodeList{" +
+              "nodes=" + nodes +
+              '}';
+    }
 }

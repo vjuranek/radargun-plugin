@@ -119,4 +119,12 @@ public class Node {
         sb.append('\'');
         return sb.toString();
     }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+              "name='" + name + '\'' +
+              ", fqdn='" + fqdn + '\'' +
+              '}';
+    }
 }

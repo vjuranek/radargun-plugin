@@ -2,8 +2,10 @@
 .project
 .settings/
 target/
+.idea/
 work/
 *.class
 *.jar
 *.hpi
+*.iml
 
