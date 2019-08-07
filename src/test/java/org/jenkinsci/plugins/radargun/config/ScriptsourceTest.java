@@ -16,19 +16,19 @@ import org.junit.Test;
 public class ScriptsourceTest {
 
     private Map<String, String> env;
-    private Map<String, String> javaProps;
+    private Map<String, Object> javaProps;
     private Node node;
     private NodeScriptConfig nodeCfg;
     private ScriptSource scriptSourceImpl;
 
     @Before
     public void setup() {
-        env = new HashMap<String, String>();
+        env = new HashMap<>();
         env.put("key1", "value1");
         env.put("key2", "");
         env.put("key3", "value3");
 
-        javaProps = new HashMap<String, String>();
+        javaProps = new HashMap<>();
         javaProps.put("-Dmy_prop1", "prop1");
         javaProps.put("-Dmy_prop2", "prop2");
 

@@ -98,7 +98,7 @@ public class YamlNodeConfigParser implements NodeConfigParser {
             LOGGER.warning("Setting up JVM options via RG jenkins plugin is deprecated and will be removed. Please use RG 3 or higher and set up JVM options direcly in RG!");
         }
         @SuppressWarnings("unchecked")
-        Map<String, String> javaProps = nodeConfig.containsKey(JAVA_PROPS_KEY) ? (Map<String, String>) nodeConfig
+        Map<String, Object> javaProps = nodeConfig.containsKey(JAVA_PROPS_KEY) ? (Map<String, Object>) nodeConfig
                 .get(JAVA_PROPS_KEY) : null;
         @SuppressWarnings("unchecked")
         Map<String, String> envVars = nodeConfig.containsKey(ENV_VARS_KEY) ? ParseUtils.mapToStringMap(nodeConfig

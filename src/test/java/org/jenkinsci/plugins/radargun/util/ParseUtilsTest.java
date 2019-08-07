@@ -34,7 +34,7 @@ public class ParseUtilsTest {
         assertNotNull(envVars);
         assertEquals("172.12.0.8", envVars.get("jgroups.udp.mcast_addr"));
         assertEquals("172.12.0.1", envVars.get("infinispan_server1_address"));
-        Map<String, String> javaProps = master.getJavaProps();
+        Map<String, Object> javaProps = master.getJavaProps();
         assertNotNull(javaProps);
         assertEquals("192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;", javaProps.get("site.default_site.tcp"));
         List<String> beforeCmds = master.getBeforeCmds();

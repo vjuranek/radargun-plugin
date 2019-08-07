@@ -12,21 +12,23 @@ public class NodeTest {
 
     @Test
     public void testAllJavaOpts() {
-        Map<String, String> javaProps = new HashMap<>();
+        Map<String, Object> javaProps = new HashMap<>();
         javaProps.put("site.default_site.tcp", "192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;");
         javaProps.put("site.default_site.udp", "192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000;");
+        javaProps.put("jgroups.bind_addr", "172.18.1.1");
+        javaProps.put("jgroups.bind_port", 7800);
         Map<String, String> envVars = new HashMap<>();
         envVars.put("infinispan_server1_address", "172.12.0.1");
         Node node = new Node("test_hostname", null, "-server -Xms8g -Xmx8g -XX:+UseLargePages", javaProps, envVars, null, null, true);
         assertNotNull(node.getAllJavaOpts());
         assertEquals(
-                " '-server -Xms8g -Xmx8g -XX:+UseLargePages -Dsite.default_site.udp=192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000; -Dsite.default_site.tcp=192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800; '",
+                " '-server -Xms8g -Xmx8g -XX:+UseLargePages -Djgroups.bind_addr=172.18.1.1 -Dsite.default_site.udp=192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000; -Dsite.default_site.tcp=192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800; -Djgroups.bind_port=7800 '",
                 node.getAllJavaOpts());
     }
     
     @Test
     public void testJavaOptsOnly() {
-        Map<String, String> javaProps = new HashMap<>();
+        Map<String, Object> javaProps = new HashMap<>();
         javaProps.put("site.default_site.tcp", "192.168.117.12:7800;192.168.117.13:7800;192.168.117.14:7800;");
         javaProps.put("site.default_site.udp", "192.168.117.12:52000;192.168.117.13:52000;192.168.117.14:52000;");
         Map<String, String> envVars = new HashMap<>();

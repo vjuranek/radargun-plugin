@@ -8,7 +8,7 @@ public class Node {
     private final String name; // name of the node. If fqdn is not specified, it's assumes that this is the hostname
     private final String fqdn; // fully qualified domain name
     private final String jvmOptions; // additional JVM settings, like -Xmx
-    private final Map<String, String> javaProps; // java properties, typically some RG scenatio variables, "-D" prefix
+    private final Map<String, Object> javaProps; // java properties, typically some RG scenatio variables, "-D" prefix
                                                  // will be automatically added
     private final Map<String, String> envVars;
     private final List<String> beforeCmds;
@@ -37,7 +37,7 @@ public class Node {
         this.gatherLogs = true;
     }
 
-    public Node(String name, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds, boolean gatherLogs) {
+    public Node(String name, String fqdn, String jvmOptions, Map<String, Object> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds, boolean gatherLogs) {
         this.name = name;
         this.fqdn = fqdn;
         this.jvmOptions = jvmOptions;
@@ -75,7 +75,7 @@ public class Node {
         return jvmOptions;
     }
 
-    public Map<String, String> getJavaProps() {
+    public Map<String, Object> getJavaProps() {
         return javaProps;
     }
 
@@ -99,7 +99,7 @@ public class Node {
         if (javaProps == null || javaProps.size() == 0) return null;
         
         StringBuilder sb = new StringBuilder();
-        for(Map.Entry<String, String> prop : javaProps.entrySet()) {
+        for(Map.Entry<String, Object> prop : javaProps.entrySet()) {
             sb.append("-D").append(prop.getKey()).append('=').append(prop.getValue()).append(' ');
         }
         return sb.toString();

@@ -21,7 +21,7 @@ public class MasterNode extends Node {
         super(name, fqdn);
     }
 
-    public MasterNode(String hostname, String fqdn, String jvmOptions, Map<String, String> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds, boolean gatherLogs) {
+    public MasterNode(String hostname, String fqdn, String jvmOptions, Map<String, Object> javaProps, Map<String, String> envVars, List<String> beforeCmds, List<String> afterCmds, boolean gatherLogs) {
         super(hostname, fqdn, jvmOptions, javaProps, envVars, beforeCmds, afterCmds, gatherLogs);
     }
 
