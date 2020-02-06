@@ -19,6 +19,7 @@ import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.util.ParseUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * {@link NodeConfigParser} for YAML configurations. YAML file can contain arbitrary section, the only required is
@@ -59,7 +60,7 @@ public class YamlNodeConfigParser implements NodeConfigParser {
     private final Yaml yaml;
 
     public YamlNodeConfigParser() {
-        this.yaml = new Yaml();
+        this.yaml = new Yaml(new SafeConstructor());
     }
 
     @Override
