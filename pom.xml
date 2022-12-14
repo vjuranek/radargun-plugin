@@ -41,7 +41,7 @@
         <java.level>8</java.level> <!-- for Jenkins Animal Sniffer plugin -->
         <jenkins.version>2.60.3</jenkins.version>
         <jenkins-test-harness.version>2.36</jenkins-test-harness.version>
-        <version.snakeyaml>1.31</version.snakeyaml>
+        <version.snakeyaml>1.32</version.snakeyaml>
         <version.mockito>2.0.31-beta</version.mockito>
     </properties>
 
