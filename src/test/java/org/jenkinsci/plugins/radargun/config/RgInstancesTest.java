@@ -50,11 +50,12 @@ public class RgInstancesTest {
     private void setRgInstallName(String name) throws IOException, SAXException {
         // go to the tools config page and click and display RG installations
         JenkinsRule.WebClient wc = rule.createWebClient();
-        HtmlPage confPage = wc.goTo("configureTools");
+        HtmlPage confPage = wc.goTo("manage/configureTools");
         HtmlPage rgPage = null;
         List<DomElement> buttons = confPage.getElementsByTagName("button");
         for (DomElement b : buttons) {
-            if ("RadarGun installations...".equals(b.asText())) {
+            String text = b.getTextContent();
+            if ("RadarGun installations...".equals(text)) {
                 rgPage = b.click();
                 break;
             }
@@ -73,7 +74,8 @@ public class RgInstancesTest {
         // save config
         buttons = confPage.getElementsByTagName("button");
         for (DomElement b : buttons) {
-            if ("Save".equals(b.asText())) {
+            String text = b.getTextContent();
+            if ("Save".equals(text)) {
                 b.click();
                 break;
             }

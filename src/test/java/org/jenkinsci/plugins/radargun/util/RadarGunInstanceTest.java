@@ -30,10 +30,14 @@ public class RadarGunInstanceTest {
     
     @Test 
     public void testCustomRgInstallation() throws Exception {
+        FreeStyleProject project = rule.createFreeStyleProject();
+        FreeStyleBuild build = project.scheduleBuild2(0).get();
+        Resolver.init(build);
+
         RadarGunInstallation expected = new RadarGunInstallation("rgTest", "/opt/radargun", JenkinsRule.NO_PROPERTIES);
         rule.jenkins.getDescriptorByType(RadarGunBuilder.DescriptorImpl.class).setInstallations(expected);
         RadarGunInstance custom = new RadarGunCustomInstallation("/opt/custom");
-        RadarGunInstallation provided = Functions.getRgInstallation(custom); 
+        RadarGunInstallation provided = Functions.getRgInstallation(custom);
         assertEquals(custom.getName(), provided.getName());
         assertEquals(((RadarGunCustomInstallation)custom).getHome(), provided.getHome());
     }
