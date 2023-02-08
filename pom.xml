@@ -23,8 +23,12 @@
         </developer>
     </developers>
 
+    <!-- required for release -->
     <scm>
+        <connection>scm:git:git://github.com/jenkinsci/radargun-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/radargun-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/radargun-plugin</url>
+        <tag>HEAD</tag>
     </scm>
 
     <licenses>
