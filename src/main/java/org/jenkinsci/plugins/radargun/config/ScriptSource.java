@@ -101,7 +101,7 @@ public abstract class ScriptSource implements Describable<ScriptSource> {
         Iterator<String> envIter = new TreeSet<String>(envVars.keySet()).iterator();
         while (envIter.hasNext()) {
             String key = envIter.next();
-            String value = envVars.get(key) instanceof String ? envVars.get(key) : envVars.get(key).toString();
+            String value = envVars.get(key);
             sb.append(key).append(ENV_KEY_VAL_SEPARATOR).append(ENV_VAR_QUOTE).append(value).append(ENV_VAR_QUOTE)
                     .append(VAR_SEPARATOR);
         }

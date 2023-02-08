@@ -3,18 +3,10 @@ package org.jenkinsci.plugins.radargun.yaml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import hudson.EnvVars;
-import hudson.model.FreeStyleBuild;
-import hudson.model.AbstractBuild;
-import hudson.util.LogTaskListener;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ExecutionException;
 
 import org.jenkinsci.plugins.radargun.config.NodeConfigParser;
 import org.jenkinsci.plugins.radargun.model.impl.MainNode;
@@ -22,24 +14,24 @@ import org.jenkinsci.plugins.radargun.model.impl.Node;
 import org.jenkinsci.plugins.radargun.model.impl.NodeList;
 import org.jenkinsci.plugins.radargun.testutil.IOUtils;
 import org.jenkinsci.plugins.radargun.util.Resolver;
-import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
 
 public class IncludeTest {
 
-    private static final Logger LOG = Logger.getLogger(IncludeTest.class.getName());
-
-    @BeforeClass
-    public static void setup() throws Exception {
-        AbstractBuild<?, ?> build = mock(FreeStyleBuild.class);
-        //Mockito cannot mock final methods, needs to mock method it calls
-        when(build.getBuildVariables()).thenReturn(new HashMap<String, String>());
-        when(build.getEnvironment(new LogTaskListener(LOG, Level.INFO))).thenReturn(new EnvVars());
-        Resolver.init(build);
-    }
+    @Rule
+    public JenkinsRule rule = new JenkinsRule();
 
     @Test
-    public void testParseNodeList() throws IOException {
+    public void testParseNodeList() throws IOException, ExecutionException, InterruptedException {
+        FreeStyleProject project = rule.createFreeStyleProject();
+        FreeStyleBuild build = project.scheduleBuild2(0).get();
+        Resolver.init(build);
+
         String config = IOUtils.loadResourceAsString("include.yaml");
         assertNotNull("Unable to load test YAML config file", config);
 
