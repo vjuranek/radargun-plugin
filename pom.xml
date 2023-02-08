@@ -7,7 +7,7 @@
     </parent>
 
     <artifactId>radargun</artifactId>
-    <version>1.15</version>
+    <version>1.16-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>RadarGun</name>
     <url>https://github.com/jenkinsci/radargun-plugin</url>
@@ -38,6 +38,7 @@
         <java.level>8</java.level> <!-- for Jenkins Animal Sniffer plugin -->
         <jenkins.version>2.361.2</jenkins.version>
         <version.snakeyaml>1.33</version.snakeyaml>
+        <spotbugs.skip>true</spotbugs.skip>
     </properties>
 
     <dependencies>
