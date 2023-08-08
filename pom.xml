@@ -41,7 +41,7 @@
     <properties>
         <java.level>8</java.level> <!-- for Jenkins Animal Sniffer plugin -->
         <jenkins.version>2.361.2</jenkins.version>
-        <version.snakeyaml>1.33</version.snakeyaml>
+        <version.snakeyaml>2.0</version.snakeyaml>
         <spotbugs.skip>true</spotbugs.skip>
     </properties>
 
